@@ -1,0 +1,179 @@
+﻿#include "ItemESP.h"
+
+#include <execution>
+
+#include ".class/CameraController/CameraController.h"
+#include "memory/ESP/ESPConfig.h"
+
+ItemEsp::ItemEsp() {}
+
+auto ItemEsp::render() -> void {
+    std::vector<Item, mi_stl_allocator<Item>> temp;
+    {
+        std::lock_guard lock_s(mutex);
+        temp = std::move(items);
+    }
+
+    const auto esp = ESPConfig::instance();
+    auto lock = esp->mutex();
+
+    if (!esp->enable) {
+        return;
+    }
+
+    if (!esp->show_item) {
+        return;
+    }
+
+    for (auto& [name, screen_pos, item_id, type, num] : temp) {
+        auto& [pos, id] = screen_pos;
+
+        if (pos.z < 0.f) {
+            continue;
+        }
+
+        ImDrawList* bg = ImGui::GetBackgroundDrawList();
+        draw_info(bg, pos, name, item_id, type, num);
+    }
+}
+
+auto ItemEsp::update() -> void {
+    process_data();
+
+    {
+        const auto esp = ESPConfig::instance();
+        auto lock = esp->mutex();
+
+        if (!esp->enable) {
+            return;
+        }
+
+        if (!esp->show_item) {
+            return;
+        }
+    }
+
+    int size = 0;
+    II::Dictionary<int, UnityResolve::UnityType::List<PickItem*>*>* items_data = nullptr;
+
+    try {
+        if (util::is_bad_ptr(CameraController::battle_world)) {
+            return;
+        }
+
+        const auto item_manager = BattleWorld::item_client_manager[CameraController::battle_world];
+        if (util::is_bad_ptr(item_manager)) {
+            return;
+        }
+
+        items_data = ClientItemFeatureManager::pick_items_point_data[item_manager];
+        if (util::is_bad_ptr(items_data)) {
+            return;
+        }
+
+        size = items_data->iCount;
+    } catch (...) {}
+
+    if (items_data == nullptr) {
+        return;
+    }
+
+    const auto w2c = W2C::instance();
+    items_commit.clear();
+    items_commit.reserve(size * 10);
+
+    std::vector<std::vector<Item, mi_stl_allocator<Item>>, mi_stl_allocator<std::vector<Item, mi_stl_allocator<Item>>>> per_index_results(size);
+
+    tbb::parallel_for(0,
+                      size,
+                      [&](const int _i) {
+                          try {
+                              const auto item_list = items_data->GetValueByIndex(_i);
+                              if (util::is_bad_ptr(item_list)) {
+                                  return;
+                              }
+
+                              const auto pickitems = std::move(item_list->ToArray()->ToVector());
+
+                              std::vector<Item, mi_stl_allocator<Item>> local_items;
+                              local_items.reserve(pickitems.size());
+
+                              for (const auto& pick_item : pickitems) {
+                                  if (util::is_bad_ptr(pick_item)) {
+                                      continue;
+                                  }
+
+                                  const auto item_net = PickItem::my_pick_item_net[pick_item];
+                                  const auto item_config = PickItem::pick_item_data_config[pick_item];
+                                  if (util::is_bad_ptr(item_net) || util::is_bad_ptr(item_config)) {
+                                      continue;
+                                  }
+
+                                  std::pair<glm::vec3, int> pos_;
+                                  auto pos = PickItem::pos[pick_item];
+                                  pos_.first = pos;
+                                  pos_.second = w2c->commit(pos);
+
+                                  int64_t id = PickItemDataConfig::item_id[item_config];
+                                  int64_t type = PickItemDataConfig::item_type[item_config];
+                                  int num = PickItemNet::num[item_net];
+                                  util::String name = std::move(PickItemDataConfig::item_name[item_config]->ToString());
+
+                                  if (name.empty()) {
+                                      continue;
+                                  }
+
+                                  local_items.emplace_back(std::move(name), pos_, id, type, num);
+                              }
+
+                              per_index_results[_i] = std::move(local_items);
+                          } catch (...) {}
+                      });
+
+    items_commit.clear();
+
+    for (const auto& vec : per_index_results) {
+        items_commit.insert(items_commit.end(), std::make_move_iterator(vec.begin()), std::make_move_iterator(vec.end()));
+    }
+}
+
+auto ItemEsp::process_data() -> void {
+    std::vector<Item, mi_stl_allocator<Item>> temp = std::move(items_commit);
+    if (temp.empty()) {
+        return;
+    }
+
+    const auto w2c = W2C::instance();
+    tbb::parallel_for(tbb::blocked_range<size_t>(0, temp.size()),
+                      [&](const tbb::blocked_range<size_t>& _range) {
+                          for (size_t i = _range.begin(); i != _range.end(); ++i) {
+                              Item& value = temp[i];
+                              value.screen_pos.first = w2c->pos_done[value.screen_pos.second];
+                          }
+                      });
+
+
+    std::lock_guard lock(mutex);
+    items = std::move(temp);
+}
+
+auto ItemEsp::draw_info(ImDrawList* _bg, const std::conditional_t<true, glm::vec3, int>& _screen_pos, util::String& _name, int64_t _id, int64_t _type, const int _num) -> void {
+    auto& [group, type, color] = info_list[_name];
+    color.Value.w = 0.4f;
+
+    if (_num > 1) {
+        _name += " x";
+        _name += std::to_string(_num);
+    }
+    const ImVec2 name_text_size = ImGui::CalcTextSize(_name.data());
+
+    const glm::vec2 size = {name_text_size.x + 2.f * 2.0f, name_text_size.y + 2.f * 2.0f};
+    const glm::vec2 min = {_screen_pos.x - size.x / 2.0f, _screen_pos.y - size.y / 2.0f};
+    const glm::vec2 max = {_screen_pos.x + size.x / 2.0f, _screen_pos.y + size.y / 2.0f};
+
+    _bg->AddRect({min.x - 1, min.y - 1}, {max.x + 1, max.y + 1}, ImColor(0.f, 0.f, 0.f, color.Value.w));
+    _bg->AddRectFilled({min.x, min.y}, {max.x, max.y}, color);
+
+    const ImVec2 text_pos = {_screen_pos.x - name_text_size.x / 2.0f, _screen_pos.y - name_text_size.y / 2.0f};
+    _bg->AddText(text_pos, ImColor(255, 255, 255), _name.data());
+}
