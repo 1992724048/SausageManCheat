@@ -3569,10 +3569,10 @@ public:
                 io << "\n";
                 io << std::format("\tAssembly: {}\n", name_map.contains(pAssembly->name) ? "" : name_map[pAssembly->name]);
                 io << std::format("\tAssemblyFile: {} \n", name_map.contains(pAssembly->file) ? "" : name_map[pAssembly->file]);
-                io << std::format("\tclass {}{} ", pClass->name, name_map.contains(pClass->parent) ? "" : " : " + name_map[pClass->parent]);
+                io << std::format("\tclass {}{} ", name_map[pClass->name], name_map.contains(pClass->parent) ? "" : " : " + name_map[pClass->parent]);
                 io << "{\n\n";
                 for (const auto& pField : pClass->fields) {
-                    io << std::format("\t\t{:+#06X} | {}{} {};\n", pField.offset, pField.static_field ? "static " : "", name_map[pField.type->name], pField.name);
+                    io << std::format("\t\t{:+#06X} | {}{} {};\n", pField.offset, pField.static_field ? "static " : "", name_map[pField.type->name], name_map[pField.name]);
                 }
                 io << "\n";
                 for (const auto& pMethod : pClass->methods) {
@@ -3580,10 +3580,10 @@ public:
                                       pMethod.flags,
                                       pMethod.args.size(),
                                       reinterpret_cast<std::uint64_t>(pMethod.function) - reinterpret_cast<std::uint64_t>(hmodule_));
-                    io << std::format("\t\t{}{} {}(", pMethod.static_function ? "static " : "", name_map[pMethod.return_type->name], pMethod.name);
+                    io << std::format("\t\t{}{} {}(", pMethod.static_function ? "static " : "", name_map[pMethod.return_type->name], name_map[pMethod.name]);
                     util::String params{};
                     for (const auto& pArg : pMethod.args) {
-                        params += std::format("{} {}, ", name_map[pArg->pType->name], pArg->name);
+                        params += std::format("{} {}, ", name_map[pArg->pType->name], name_map[pArg->name]);
                     }
                     if (!params.empty()) {
                         params.pop_back();

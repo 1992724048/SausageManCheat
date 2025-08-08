@@ -40,19 +40,15 @@ public:
         camera_controller = _i;
         BattleRole::roles.clear();
 
-        LOG_DEBUG << "update_hook is call";
-
         try {
             const auto trans = camera_tran[camera_controller];
             if (util::is_bad_ptr(trans)) {
-                LOG_DEBUG << "trans is null";
                 camera_pos = trans->GetPosition();
                 return;
             }
 
             const auto camera_ptr = camera[_i];
             if (util::is_bad_ptr(camera_ptr)) {
-                LOG_DEBUG << "camera_ptr is null";
                 camera_controller = nullptr;
                 return;
             }
@@ -63,50 +59,39 @@ public:
 
             const auto local = lock_role[camera_controller];
             if (util::is_bad_ptr(local)) {
-                LOG_DEBUG << "local is null";
                 camera_controller = nullptr;
                 return;
             }
 
             const auto role_logic = BattleRole::role_logic[local];
             if (util::is_bad_ptr(role_logic)) {
-                LOG_DEBUG << "role_logic is null";
                 camera_controller = nullptr;
                 return;
             }
 
             const auto data = BattleRoleLogic::statistics_data[role_logic];
             if (util::is_bad_ptr(data)) {
-                LOG_DEBUG << "data is null";
                 camera_controller = nullptr;
                 return;
             }
 
             battle_world = StatisticsData::game_world[data];
             if (util::is_bad_ptr(battle_world)) {
-                LOG_DEBUG << "battle_world is null";
                 camera_controller = nullptr;
                 return;
             }
 
-            LOG_DEBUG << "get start_game";
             start_game = BattleWorld::start_game[battle_world];
-            LOG_DEBUG << "start_game is not null";
             BattleRole::get_all();
-            LOG_DEBUG << "roles: " << BattleRole::roles.size();
         } catch (...) {
-            LOG_DEBUG << "process is error";
             camera_controller = nullptr;
             return;
         }
 
         if (BattleRole::roles.empty()) {
-            LOG_DEBUG << "roles is null";
             camera_controller = nullptr;
             return;
         }
-
-        LOG_DEBUG << "update is call";
 
         FeatureBase::instance().update();
         w2c->start();

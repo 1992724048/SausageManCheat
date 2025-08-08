@@ -8,34 +8,28 @@ auto BattleRole::get_all() -> void {
         roles.clear();
 
         if (util::is_bad_ptr(CameraController::start_game)) {
-            LOG_DEBUG << "start_game is nullptr";
             return;
         }
 
         const auto role_list = StartGame::role_list[CameraController::start_game];
         if (util::is_bad_ptr(role_list)) {
-            LOG_DEBUG << "role_list is nullptr";
             return;
         }
 
         roles.reserve(role_list->size);
         const auto role_vec = std::move(role_list->ToArray()->ToVector());
         for (const auto& role_lg : role_vec) {
-            const auto lg = BattleRoleLogic::client[role_lg];
-            if (util::is_bad_ptr(role_lg)) {
-                continue;
-            }
+            try {
+                if (util::is_bad_ptr(role_lg)) {
+                    continue;
+                }
 
-            const auto client = RoleLogicClient::client[lg];
-            if (util::is_bad_ptr(client)) {
-                continue;
-            }
-
-            roles.push_back(client);
+                roles.push_back(BattleRoleLogic::get_role(role_lg));
+            } catch (...) {}
         }
-
-        LOG_DEBUG << "roles :" << roles.size();
-    } catch (...) {}
+    } catch (...) {
+        
+    }
 }
 
 BattleRole::BattleRole() {}

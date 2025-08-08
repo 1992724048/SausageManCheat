@@ -44,13 +44,13 @@ namespace util {
     using Map = phmap::parallel_flat_hash_map<K, V, phmap::priv::hash_default_hash<K>, phmap::priv::hash_default_eq<K>, mi_stl_allocator<std::pair<K, V>>, 4, std::shared_mutex>;
     using String = std::basic_string<char, std::char_traits<char>, mi_stl_allocator<char>>;
 
-    inline auto is_bad_ptr(const void* _address, const int _size = 1) -> bool {
+    inline auto is_bad_ptr(void* _address, const int _size = 1) -> bool {
         if (reinterpret_cast<std::uintptr_t>(_address) < 0xF000) {
             return true;
         }
 
         try {
-            return std::memcmp(_address, _address, _size);
+            return *static_cast<char*>(_address) = *static_cast<char*>(_address);
         } catch (...) {
             return true;
         }

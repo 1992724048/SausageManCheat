@@ -142,8 +142,9 @@ private:
     }
 
     static auto CALLBACK wndproc(const HWND hWnd, const UINT uMsg, const WPARAM wParam, const LPARAM lParam) -> LRESULT {
+#ifdef _DEBUG
         ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
-
+#endif
         switch (uMsg) {
             case WM_CLOSE:
                 if (MessageBoxW(nullptr, L"确定要退出吗?", L"提示", MB_YESNO | MB_ICONQUESTION) == IDYES) {

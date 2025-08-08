@@ -15,6 +15,7 @@ public:
     inline static IF::Variable<BattleRoleLogic, StatisticsData*> statistics_data;
     inline static IF::Variable<BattleRoleLogic, RoleLogicClient*> client;
 
+    inline static I::MethodPointer<BattleRole*, BattleRoleLogic*> get_role;
     inline static IC* class_;
 
     BattleRoleLogic();
@@ -32,5 +33,7 @@ public:
         statistics_data.Init(class_->Get<IF>("$B"));
         client.Init(class_->Get<IF>("teammateConfig"));
         client.offset -= sizeof(void*);
+
+        class_->Get<IM>("$PB")->Cast(get_role);
     }
 };
