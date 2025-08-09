@@ -1689,6 +1689,18 @@
     <ClInclude Include=".class\RoleLogicClient\RoleLogicClient.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Feature\Features\Memory\Memory.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include=".class\WeaponControl\WeaponControl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include=".class\SOWeaponControl\SOWeaponControl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include=".class\BulletSpeedAndGravity\BulletSpeedAndGravity.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -1860,6 +1872,18 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include=".class\RoleLogicClient\RoleLogicClient.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Feature\Features\Memory\Memory.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include=".class\WeaponControl\WeaponControl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include=".class\SOWeaponControl\SOWeaponControl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include=".class\BulletSpeedAndGravity\BulletSpeedAndGravity.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

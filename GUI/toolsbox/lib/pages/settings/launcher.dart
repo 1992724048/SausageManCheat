@@ -265,7 +265,7 @@ class _LauncherState extends State<Launcher>
             CardModuleTiny(
               icon: Icons.schema,
               label: '计算设备',
-              description: '选择用于计算的设备 (选择GPU或FPGA可以缓解CPU负载)',
+              description: '选择用于计算的设备 (选择GPU(独显)或GPU(核显)可以缓解CPU负载)',
               child: [
                 Center(
                   child: AsyncDropdown(

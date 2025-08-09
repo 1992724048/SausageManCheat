@@ -120,7 +120,7 @@ class _MemoryState extends State<Memory> with SingleTickerProviderStateMixin {
           CardModule(
             icon: Symbols.recenter,
             label: "弹道追踪",
-            description: "子弹生成后朝目标方向飞去 (和子追不兼容)",
+            description: "子弹生成后朝目标方向飞去",
             child: [
               AsyncSwitch(
                 getter: () async {
@@ -170,6 +170,31 @@ class _MemoryState extends State<Memory> with SingleTickerProviderStateMixin {
               ),
             ],
           ),
+          CardModule(
+            icon: Symbols.weight,
+            label: "无重力子弹",
+            description: "子弹飞行过程中不会受物理影响下坠",
+            child: [
+              AsyncSwitch(
+                getter: () async {
+                  f_enable = await configData.invoke(
+                    "mem_get",
+                    params: {'field_name': 'f_bullet_no_gravity'},
+                  );
+                  setState(() {});
+                  return f_enable;
+                },
+                setter: (value) async {
+                  f_enable = value;
+                  setState(() {});
+                  return await configData.invoke(
+                    "mem_set",
+                    params: {'field_name': 'f_bullet_no_gravity', 'value': value},
+                  );
+                },
+              ),
+            ],
+          ),
           // CardModule(
           //   icon: Symbols.face_5,
           //   label: "枪枪打头",
@@ -195,31 +220,31 @@ class _MemoryState extends State<Memory> with SingleTickerProviderStateMixin {
           //     ),
           //   ],
           // ),
-          // CardModule(
-          //   icon: Symbols.autoplay,
-          //   label: "全枪自动",
-          //   description: "所有枪械都拥有全自动模式",
-          //   child: [
-          //     AsyncSwitch(
-          //       getter: () async {
-          //         f_enable = await configData.invoke(
-          //           "mem_get",
-          //           params: {'field_name': 'f_all_gun_auto'},
-          //         );
-          //         setState(() {});
-          //         return f_enable;
-          //       },
-          //       setter: (value) async {
-          //         f_enable = value;
-          //         setState(() {});
-          //         return await configData.invoke(
-          //           "mem_set",
-          //           params: {'field_name': 'f_all_gun_auto', 'value': value},
-          //         );
-          //       },
-          //     ),
-          //   ],
-          // ),
+          CardModule(
+            icon: Symbols.autoplay,
+            label: "全枪全自动",
+            description: "所有枪械都拥有全自动开火模式 (游戏默认按B键切换开火模式)",
+            child: [
+              AsyncSwitch(
+                getter: () async {
+                  f_enable = await configData.invoke(
+                    "mem_get",
+                    params: {'field_name': 'f_all_gun_auto'},
+                  );
+                  setState(() {});
+                  return f_enable;
+                },
+                setter: (value) async {
+                  f_enable = value;
+                  setState(() {});
+                  return await configData.invoke(
+                    "mem_set",
+                    params: {'field_name': 'f_all_gun_auto', 'value': value},
+                  );
+                },
+              ),
+            ],
+          ),
           // ExpandFadeWidget2(
           //   alwaysShow: CardModuleTiny(
           //     icon: Symbols.azm,

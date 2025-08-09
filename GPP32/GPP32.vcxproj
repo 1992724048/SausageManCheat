@@ -89,10 +89,15 @@ tbbmalloc_debug.lib;
 tbbmalloc_proxy_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ForceFileOutput>
       </ForceFileOutput>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)GPP32\.tools\Debug.bat</Command>
     </PostBuildEvent>
+    <Manifest>
+      <EnableDpiAwareness>
+      </EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -142,6 +147,7 @@ tbbmalloc_proxy_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     <ClInclude Include=".class\BattleRole\BattleRole.h" />
     <ClInclude Include=".class\BattleWorld\BattleWorld.h" />
     <ClInclude Include=".class\BodyPart\BodyPart.h" />
+    <ClInclude Include=".class\BulletSpeedAndGravity\BulletSpeedAndGravity.h" />
     <ClInclude Include=".class\CameraController\CameraController.h" />
     <ClInclude Include=".class\CarNetMirror\CarNetMirror.h" />
     <ClInclude Include=".class\CarNet\CarNet.h" />
@@ -157,8 +163,10 @@ tbbmalloc_proxy_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     <ClInclude Include=".class\RoleControl\RoleControl.h" />
     <ClInclude Include=".class\RoleLogicClient\RoleLogicClient.h" />
     <ClInclude Include=".class\SOCarDataConfig\SOCarDataConfig.h" />
+    <ClInclude Include=".class\SOWeaponControl\SOWeaponControl.h" />
     <ClInclude Include=".class\StartGame\StartGame.h" />
     <ClInclude Include=".class\StatisticsData\StatisticsData.h" />
+    <ClInclude Include=".class\WeaponControl\WeaponControl.h" />
     <ClInclude Include="App\App.h" />
     <ClInclude Include="Feature\FeatureRegistrar.h" />
     <ClInclude Include="Feature\Features\AimBot\AimBot.h" />
@@ -167,6 +175,7 @@ tbbmalloc_proxy_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     <ClInclude Include="Feature\Features\ESP\CarESP.h" />
     <ClInclude Include="Feature\Features\ESP\ItemESP.h" />
     <ClInclude Include="Feature\Features\ESP\RoleESP.h" />
+    <ClInclude Include="Feature\Features\Memory\Memory.h" />
     <ClInclude Include="Library\crash_dump.h" />
     <ClInclude Include="Library\dxhook.h" />
     <ClInclude Include="Library\encode.h" />
@@ -702,6 +711,7 @@ tbbmalloc_proxy_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     <ClCompile Include=".class\BattleRole\BattleRole.cpp" />
     <ClCompile Include=".class\BattleWorld\BattleWorld.cpp" />
     <ClCompile Include=".class\BodyPart\BodyPart.cpp" />
+    <ClCompile Include=".class\BulletSpeedAndGravity\BulletSpeedAndGravity.cpp" />
     <ClCompile Include=".class\CameraController\CameraController.cpp" />
     <ClCompile Include=".class\CarNetMirror\CarNetMirror.cpp" />
     <ClCompile Include=".class\CarNet\CarNet.cpp" />
@@ -717,8 +727,10 @@ tbbmalloc_proxy_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     <ClCompile Include=".class\RoleControl\RoleControl.cpp" />
     <ClCompile Include=".class\RoleLogicClient\RoleLogicClient.cpp" />
     <ClCompile Include=".class\SOCarDataConfig\SOCarDataConfig.cpp" />
+    <ClCompile Include=".class\SOWeaponControl\SOWeaponControl.cpp" />
     <ClCompile Include=".class\StartGame\StartGame.cpp" />
     <ClCompile Include=".class\StatisticsData\StatisticsData.cpp" />
+    <ClCompile Include=".class\WeaponControl\WeaponControl.cpp" />
     <ClCompile Include="App\App.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Feature\Features\AimBot\AimBot.cpp" />
@@ -727,6 +739,7 @@ tbbmalloc_proxy_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     <ClCompile Include="Feature\Features\ESP\CarESP.cpp" />
     <ClCompile Include="Feature\Features\ESP\ItemESP.cpp" />
     <ClCompile Include="Feature\Features\ESP\RoleESP.cpp" />
+    <ClCompile Include="Feature\Features\Memory\Memory.cpp" />
     <ClCompile Include="Library\events\joins\abstracteventjoin.cpp" />
     <ClCompile Include="Library\events\joins\eventjoinwrapper.cpp" />
     <ClCompile Include="Library\glm\detail\glm.cpp" />

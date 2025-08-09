@@ -121,12 +121,6 @@ auto App::init_cheat_data(HWND, ID3D11Device* pDevice, ID3D11DeviceContext*, IDX
 }
 
 auto App::on_rander(ID3D11DeviceContext*) -> void {
-    /*if (!CameraController::camera_controller) {
-        return;
-    }
-    if (BattleRole::roles.empty()) {
-        return;
-    }*/
     FeatureBase::instance().render();
     CameraController::camera_controller = nullptr;
 }

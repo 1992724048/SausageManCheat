@@ -87,6 +87,11 @@ auto AimBot::render() -> void {
     AimInfo* best = nullptr;
     float best_dist = FLT_MAX;
 
+    const auto local = local_role.load();
+    if (!local) {
+        return;
+    }
+
     lock_role = nullptr;
     for (auto& a : temp) {
         if (a.real_ptr != lock.ptr || lock.ptr == nullptr) {
@@ -95,7 +100,7 @@ auto AimBot::render() -> void {
             }
         }
 
-        if (a.local || a.team == local_role.load()->team) {
+        if (a.local || a.team == local->team) {
             continue;
         }
         if (a.screen_pos.first.z < 0.f) {
@@ -178,14 +183,14 @@ auto AimBot::render() -> void {
                 return;
             }
 
-            const ESP::Role* local = ESP::instance()->local_role.load();
+            const ESP::Role* role = ESP::instance()->local_role.load();
             const float actual_speed = 10.0f - cfg->speed;
-            if (!local) {
+            if (!role) {
                 return;
             }
 
             float cur_pitch_deg = glm::degrees(glm::eulerAngles(y_q).x);
-            float cur_yaw_deg = local->y_rot;
+            float cur_yaw_deg = role->y_rot;
 
             const float target_yaw = angles.x;
             const float target_pitch = angles.y;
@@ -288,6 +293,15 @@ auto AimBot::process_data() -> void {
         if (value.local) {
             local_role = &value;
         }
+    }
+
+    if (util::is_bad_ptr(CameraController::local_role)) {
+        return;
+    }
+
+    const auto weapon = BattleRole::user_weapon[CameraController::local_role];
+    if (util::is_bad_ptr(weapon)) {
+        return;
     }
 
     std::lock_guard lock_s(mutex);

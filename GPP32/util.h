@@ -50,10 +50,12 @@ namespace util {
         }
 
         try {
-            return *static_cast<char*>(_address) = *static_cast<char*>(_address);
+            *static_cast<char*>(_address) = *static_cast<char*>(_address);
         } catch (...) {
             return true;
         }
+
+        return false;
     }
 
     template<typename T>

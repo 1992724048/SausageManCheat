@@ -16,10 +16,6 @@ public:
     inline static I::MethodPointer<void, BulletControl*, StartGame*, int, int, int, II::String*, int, glm::vec3, glm::quat> local_role_weapon_init;
 
     inline static IF::Variable<BulletControl, bool> is_clear;
-    inline static IF::Variable<BulletControl, bool> is_clear2;
-    inline static IF::Variable<BulletControl, bool> is_clear3;
-    inline static IF::Variable<BulletControl, bool> is_clear4;
-    inline static IF::Variable<BulletControl, bool> is_clear5;
     inline static IF::Variable<BulletControl, glm::vec3> fire_point;
 
     inline static IC* class_;
@@ -27,7 +23,7 @@ public:
     BulletControl();
     ~BulletControl();
 
-    static auto local_role_weapon_init_Hook(BulletControl* _bc, StartGame* _a, const int _b, const int _c, const int _d, II::String* _e, const int _f, glm::vec3 _pos, glm::quat _g) -> void {
+    static auto local_role_weapon_init_hook(BulletControl* _bc, StartGame* _a, const int _b, const int _c, const int _d, II::String* _e, const int _f, glm::vec3 _pos, glm::quat _g) -> void {
         const auto mem = MemoryConfig::instance();
         mem->mutex();
 
@@ -71,16 +67,12 @@ public:
         }
 
     no_tg:
-        return HardBreakPoint::call_origin(local_role_weapon_init_Hook, _bc, _a, _b, _c, _d, _e, _f, _pos, _g);
+        return HardBreakPoint::call_origin(local_role_weapon_init_hook, _bc, _a, _b, _c, _d, _e, _f, _pos, _g);
     }
 
     static auto hit_role_hook(BulletControl* _i, BodyPart* _body) -> void {
         const auto mem = MemoryConfig::instance();
         mem->mutex();
-
-        LOG_DEBUG << "is_clear1:" << is_clear[_i] << " is_clear2:" << is_clear2[_i] << " is_clear3:" << is_clear3[_i] << " is_clear4:" << is_clear4[_i] << " is_clear5:" << is_clear5[_i];
-        is_clear2[_i] = true;
-        is_clear3[_i] = true;
 
         try {
             if (mem->all_hit_head) {
@@ -100,14 +92,10 @@ public:
     auto init() -> void override {
         class_ = I::Get("Assembly-CSharp.dll")->Get("$iA");
         is_clear.Init(class_->Get<IF>("$b"));
-        is_clear2.Init(class_->Get<IF>("$e"));
-        is_clear3.Init(class_->Get<IF>("$n"));
-        is_clear4.Init(class_->Get<IF>("$N"));
-        is_clear5.Init(class_->Get<IF>("$p"));
 
         class_->Get<IM>("$sB")->Cast(hit_role);
         class_->Get<IM>("$Mb")->Cast(local_role_weapon_init);
         // HardBreakPoint::set_break_point(hit_role, hit_role_hook);
-        HardBreakPoint::set_break_point(local_role_weapon_init, local_role_weapon_init_Hook);
+        HardBreakPoint::set_break_point(local_role_weapon_init, local_role_weapon_init_hook);
     }
 };

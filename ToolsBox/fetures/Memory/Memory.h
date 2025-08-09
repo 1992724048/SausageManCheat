@@ -13,6 +13,7 @@ public:
     config::Field<bool> f_ballistics_tracking;
     config::Field<bool> f_damage_multi;
     config::Field<int> f_damage_multi_value;
+    config::Field<bool> f_bullet_no_gravity;
 
     METHODS_BEGIN
         METHOD_ADD(mem_get)

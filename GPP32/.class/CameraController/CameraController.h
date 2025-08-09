@@ -16,7 +16,7 @@ public:
     inline static IF::Variable<CameraController, glm::quat> camera_rotation_y;
     inline static IF::Variable<CameraController, II::Transform*> camera_tran;
     inline static IF::Variable<CameraController, II::Camera*> camera;
-    inline static IF::Variable < CameraController, BattleRole*> lock_role;
+    inline static IF::Variable<CameraController, BattleRole*> lock_role;
 
     inline static I::MethodPointer<void, CameraController*> update;
 
@@ -24,6 +24,9 @@ public:
     inline static BattleWorld* battle_world;
     inline static StartGame* start_game;
     inline static CameraController* camera_controller;
+    inline static BattleRole* local_role;
+    inline static BattleRoleLogic* local_role_logic;
+    inline static StatisticsData* local_role_statistics;
 
     inline static IC* class_;
 
@@ -43,9 +46,10 @@ public:
         try {
             const auto trans = camera_tran[camera_controller];
             if (util::is_bad_ptr(trans)) {
-                camera_pos = trans->GetPosition();
                 return;
             }
+
+            camera_pos = trans->GetPosition();
 
             const auto camera_ptr = camera[_i];
             if (util::is_bad_ptr(camera_ptr)) {
@@ -57,25 +61,25 @@ public:
             w2c->camera_matrix = camera_ptr->GetProjectionMatrix() * view;
             w2c->screen_size = DXHook::size;
 
-            const auto local = lock_role[camera_controller];
-            if (util::is_bad_ptr(local)) {
+            local_role = lock_role[camera_controller];
+            if (util::is_bad_ptr(local_role)) {
                 camera_controller = nullptr;
                 return;
             }
 
-            const auto role_logic = BattleRole::role_logic[local];
-            if (util::is_bad_ptr(role_logic)) {
+            local_role_logic = BattleRole::role_logic[local_role];
+            if (util::is_bad_ptr(local_role_logic)) {
                 camera_controller = nullptr;
                 return;
             }
 
-            const auto data = BattleRoleLogic::statistics_data[role_logic];
-            if (util::is_bad_ptr(data)) {
+            local_role_statistics = BattleRoleLogic::statistics_data[local_role_logic];
+            if (util::is_bad_ptr(local_role_statistics)) {
                 camera_controller = nullptr;
                 return;
             }
 
-            battle_world = StatisticsData::game_world[data];
+            battle_world = StatisticsData::game_world[local_role_statistics];
             if (util::is_bad_ptr(battle_world)) {
                 camera_controller = nullptr;
                 return;

@@ -7,6 +7,7 @@ NFS(f_all_hit_head, "", "Memory", false),
 NFS(f_lock_role, "", "Memory", false),
 NFS(f_all_gun_auto, "", "Memory", false),
 NFS(f_ballistics_tracking, "", "Memory", false),
+NFS(f_bullet_no_gravity, "", "Memory", false),
 NFS(f_damage_multi, "", "Memory", false),
 NFS(f_damage_multi_value, "", "Memory", 1) {}
 
@@ -46,6 +47,10 @@ auto Memory::mem_get(const flutter::MethodCall<>& _method_call, std::unique_ptr<
 
             functions["f_ballistics_tracking"] = [&] {
                 _result->Success(flutter::EncodableValue(that->f_ballistics_tracking));
+                };
+
+            functions["f_bullet_no_gravity"] = [&] {
+                _result->Success(flutter::EncodableValue(that->f_bullet_no_gravity));
                 };
         });
 
@@ -92,6 +97,11 @@ auto Memory::mem_set(const flutter::MethodCall<>& _method_call, std::unique_ptr<
 
     if (field_name == "f_ballistics_tracking") {
         that->f_ballistics_tracking = args.at(flutter::EncodableValue("value")).get<bool>();
+        goto _return;
+    }
+
+    if (field_name == "f_bullet_no_gravity") {
+        that->f_bullet_no_gravity = args.at(flutter::EncodableValue("value")).get<bool>();
         goto _return;
     }
 

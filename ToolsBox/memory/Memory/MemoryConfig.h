@@ -11,6 +11,7 @@ public:
     bool lock_role;
     bool all_gun_auto;
     bool ballistics_tracking;
+    bool bullet_no_gravity;
 
     MemoryConfig();
     ~MemoryConfig() = default;

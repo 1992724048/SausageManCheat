@@ -241,10 +241,12 @@ auto AppConfig::config_set(const flutter::MethodCall<>& _method_call, std::uniqu
         } else {
             try {
                 if (!SYCL::instance().get_xpus().empty()) {
-                    if (that->f_calc_process.value().empty()) {
-                        that->f_no_sycl = false;
-                        that->f_calc_process = SYCL::instance().get_xpus().begin()->first;
-                        that->f_calc_xpu = magic_enum::enum_cast<XPU>(SYCL::instance().get_xpus().begin()->second).value();
+                    that->f_no_sycl = false;
+                    that->f_calc_process = SYCL::instance().get_xpus().begin()->first;
+                    that->f_calc_xpu = magic_enum::enum_cast<XPU>(SYCL::instance().get_xpus().begin()->second).value();
+                    if (!that->switch_device()) {
+                        MessageBeep(MB_ICONERROR);
+                        goto _return_false;
                     }
                     goto _return;
                 }
@@ -258,6 +260,7 @@ _return:
     _result->Success(flutter::EncodableValue(true));
 _return_cs:
     App::instance().commit_config();
+    return;
 _return_false:
     _result->Success(flutter::EncodableValue(false));
 }

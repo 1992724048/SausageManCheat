@@ -161,7 +161,7 @@ class _AimBotState extends State<AimBot> with SingleTickerProviderStateMixin {
                 CardModule(
                   icon: Symbols.keyboard,
                   label: "自瞄按键",
-                  description: "自瞄功能的触发按键",
+                  description: "自瞄功能的触发按键，角色空手不会触发自瞄",
                   child: [
                     AsyncHotkeyInput(
                       getter: () async {
