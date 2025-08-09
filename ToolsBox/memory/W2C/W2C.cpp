@@ -35,7 +35,7 @@ auto W2C::calc_pos() -> void {
                       [&](const tbb::blocked_range<size_t>& _range) {
                           for (size_t k = _range.begin(); k != _range.end(); ++k) {
                               const auto& [id, position] = transformed[k];
-                              if (id < 0 || id >= 4096) {
+                              if (id < 0 || id >= 8192) {
                                   continue;
                               }
                               pos_done[id] = position;

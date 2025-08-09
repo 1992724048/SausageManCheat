@@ -58,6 +58,7 @@ public:
         {(const char*)u8"R1895", {(const char*)u8"武器", "手枪", {250, 139, 54}}},
         {(const char*)u8"5.56mm", {(const char*)u8"子弹", "", {87, 143, 67}}},
         {(const char*)u8"AUG", {(const char*)u8"武器", "突击步枪", {153, 254, 121}}},
+        {(const char*)u8"QBZ", {(const char*)u8"武器", "突击步枪", {153, 254, 121}}},
         {(const char*)u8"SCAR_L", {(const char*)u8"武器", "突击步枪", {153, 254, 121}}},
         {(const char*)u8"M16A4", {(const char*)u8"武器", "突击步枪", {153, 254, 121}}},
         {(const char*)u8"M416", {(const char*)u8"武器", "突击步枪", {153, 254, 121}}},

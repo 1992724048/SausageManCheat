@@ -147,9 +147,8 @@ private:
 #endif
         switch (uMsg) {
             case WM_CLOSE:
-                if (MessageBoxW(nullptr, L"确定要退出吗?", L"提示", MB_YESNO | MB_ICONQUESTION) == IDYES) {
-                    TerminateProcess(GetCurrentProcess(), 0);
-                }
+                MessageBoxW(nullptr, L"请从启动器关闭!", L"提示", 0);
+                return 0;
             default:
                 break;
         }

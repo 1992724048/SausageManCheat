@@ -120,7 +120,7 @@ class _MemoryState extends State<Memory> with SingleTickerProviderStateMixin {
           CardModule(
             icon: Symbols.recenter,
             label: "弹道追踪",
-            description: "子弹生成后朝目标方向飞去",
+            description: "子弹生成后朝目标方向飞去 (需要开启自瞄才能工作)",
             child: [
               AsyncSwitch(
                 getter: () async {

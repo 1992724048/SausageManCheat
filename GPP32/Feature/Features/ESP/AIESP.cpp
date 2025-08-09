@@ -45,19 +45,6 @@ auto AIESP::render() -> void {
 auto AIESP::update() -> void {
     process_data();
 
-    {
-        const auto esp = ESPConfig::instance();
-        auto lock = esp->mutex();
-
-        if (!esp->enable) {
-            return;
-        }
-
-        if (!esp->show_ai) {
-            return;
-        }
-    }
-
     int size = 0;
     II::List<RoleAILogic*>* ais_data = nullptr;
     try {
@@ -121,7 +108,6 @@ auto AIESP::process_data() -> void {
     for (auto& value : temp) {
         value.screen_pos.first = w2c->pos_done[value.screen_pos.second];
     }
-
 
     std::lock_guard lock(mutex);
     ais = std::move(temp);

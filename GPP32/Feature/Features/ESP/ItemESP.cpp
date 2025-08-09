@@ -44,19 +44,6 @@ auto ItemEsp::render() -> void {
 auto ItemEsp::update() -> void {
     process_data();
 
-    {
-        const auto esp = ESPConfig::instance();
-        auto lock = esp->mutex();
-
-        if (!esp->enable) {
-            return;
-        }
-
-        if (!esp->show_item) {
-            return;
-        }
-    }
-
     int size = 0;
     II::Dictionary<int, UnityResolve::UnityType::List<PickItem*>*>* items_data = nullptr;
 

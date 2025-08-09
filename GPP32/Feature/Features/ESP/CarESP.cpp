@@ -46,19 +46,6 @@ auto CarEsp::render() -> void {
 auto CarEsp::update() -> void {
     process_data();
 
-    {
-        const auto esp = ESPConfig::instance();
-        auto lock = esp->mutex();
-
-        if (!esp->enable) {
-            return;
-        }
-
-        if (!esp->show_cars) {
-            return;
-        }
-    }
-
     int size = 0;
     II::List<::Car*>* cars_data = nullptr;
     try {

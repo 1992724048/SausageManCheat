@@ -43,7 +43,7 @@ auto W2C::commit(const glm::vec3& _pos) -> int {
     static std::mutex mutex;
     std::lock_guard lock(mutex);
 
-    if (count >= 4096) {
+    if (count >= 8192) {
         return 0;
     }
 

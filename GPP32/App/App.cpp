@@ -122,5 +122,4 @@ auto App::init_cheat_data(HWND, ID3D11Device* pDevice, ID3D11DeviceContext*, IDX
 
 auto App::on_rander(ID3D11DeviceContext*) -> void {
     FeatureBase::instance().render();
-    CameraController::camera_controller = nullptr;
 }

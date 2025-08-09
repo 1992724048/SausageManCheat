@@ -17,6 +17,7 @@ public:
         std::pair<glm::vec3, int> screen_pos;
         glm::vec3 pos;
         glm::vec3 pos_head;
+        glm::vec3 pos_neck;
         float x_rot;
         float y_rot;
         bool dead;
@@ -27,6 +28,9 @@ public:
     std::vector<AimInfo, mi_stl_allocator<AimInfo>> roles_commit;
     std::atomic<AimInfo*> local_role = nullptr;
     std::atomic<AimInfo*> lock_role = nullptr;
+
+    float bullet_speed;
+    float bullet_gravity;
 
     auto render() -> void override;
     auto update() -> void override;

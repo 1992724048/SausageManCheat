@@ -19,10 +19,10 @@ public:
     struct DR7 {
         uint32_t raw = 0;
 
-        auto set(const int _id, void* address) -> void {
-            raw |= (1 << (_id * 2)); // Lx
-            raw |= (0b00 << (16 + _id * 4)); // RWx: execute
-            raw |= (0b00 << (18 + _id * 4)); // LENx: 1 byte
+        auto set(const int _id, void* _address) -> void {
+            raw |= (1 << (_id * 2));
+            raw |= (0b00 << (16 + _id * 4));
+            raw |= (0b00 << (18 + _id * 4));
         }
 
         auto clear(const int _id) -> void {
@@ -107,8 +107,10 @@ public:
 private:
     inline static std::bitset<4> bp_status_;
     inline static std::shared_mutex mutex_;
-    inline static util::Map<void*, BreakPoint> breakpoints_;
-    inline static util::Map<void*, void*> reverse_map_;
+    inline static phmap::parallel_flat_hash_map<void*, BreakPoint, phmap::priv::hash_default_hash<void*>, phmap::priv::hash_default_eq<void*>, mi_stl_allocator<std::pair<void*, BreakPoint>>, 4,
+                                                std::shared_mutex> breakpoints_;
+    inline static phmap::parallel_flat_hash_map<void*, void*, phmap::priv::hash_default_hash<void*>, phmap::priv::hash_default_eq<void*>, mi_stl_allocator<std::pair<void*, void*>>, 4,
+                                                std::shared_mutex> reverse_map_;
 
     class ThreadHandle {
     public:

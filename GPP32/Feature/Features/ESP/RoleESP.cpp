@@ -73,9 +73,7 @@ auto ESP::render() -> void {
             if (esp->show_bone && !role.falling) {
                 auto& [head, _id] = role.screen_pos_top;
                 auto& [neck, _id2] = role.screen_pos_neck;
-
-                const glm::vec2 pos_on_line = glm::mix(neck, head, 0.5);
-                
+                const glm::vec2 pos_on_line = glm::mix(neck, head, 0.55);
                 bg->AddCircle({ pos_on_line.x, pos_on_line.y }, glm::distance(neck, head) / 2, ImColor(25, 255, 25));
                 draw_bone(bg, role.bones);
             }

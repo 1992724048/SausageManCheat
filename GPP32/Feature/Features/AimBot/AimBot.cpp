@@ -68,6 +68,9 @@ auto AimBot::render() -> void {
     std::vector<AimInfo, mi_stl_allocator<AimInfo>> temp;
     {
         std::lock_guard lg(mutex);
+        if (roles.empty()) {
+            return;
+        }
         temp = roles;
     }
 
@@ -177,9 +180,26 @@ auto AimBot::render() -> void {
             glm::quat& x_q = CameraController::camera_rotation_x[CameraController::camera_controller];
             glm::quat& y_q = CameraController::camera_rotation_y[CameraController::camera_controller];
 
-            const glm::vec2 angles = calculate_angles(CameraController::camera_pos, tgt->pos_head);
-            auto [xq_target, yq_target] = calc_quat(angles);
+            glm::vec3 target_pos = tgt->pos_head;
 
+            const float dist = glm::distance(local->pos_head, target_pos);
+            float dist2 = dist - 2.0f;
+            if (dist2 < 0) {
+                dist2 = 0;
+            }
+            const float flight_time = dist2 / bullet_speed;
+
+            if (bullet_gravity != 0.f) {
+                target_pos.y += 0.5f * bullet_gravity * flight_time * flight_time;
+            }
+
+            glm::vec2 angles = calculate_angles(CameraController::camera_pos, tgt->pos_head);
+            angles.x += dist * 0.000068;
+            if (angles.x > 360.f) {
+                angles.x -= 360.f;
+            }
+
+            auto [xq_target, yq_target] = calc_quat(angles);
             if (cfg->speed <= 1.0f) {
                 x_q = xq_target;
                 y_q = yq_target;
@@ -274,9 +294,9 @@ auto AimBot::update() -> void {
             _i.local = BattleRoleLogic::local[role_logic];
             _i.falling = weak != 100 && hp == 0;
             _i.dead = weak == 0 && hp == 0;
-            glm::vec3 pos_neck = trans_neck->GetPosition();
+            _i.pos_neck = trans_neck->GetPosition();
             glm::vec3 pos_head = trans->GetPosition();
-            _i.pos_head = glm::mix(pos_neck, pos_head, 0.6);
+            _i.pos_head = glm::mix(_i.pos_neck, pos_head, 0.65);
             _i.screen_pos.second = w2c->commit(_i.pos_head);
             _i.real_ptr = role;
         } catch (...) {}
@@ -298,12 +318,31 @@ auto AimBot::process_data() -> void {
         }
     }
 
-    if (util::is_bad_ptr(CameraController::local_role)) {
-        return;
-    }
+    try {
+        if (util::is_bad_ptr(CameraController::local_role)) {
+            roles.clear();
+            return;
+        }
 
-    const auto weapon = BattleRole::user_weapon[CameraController::local_role];
-    if (util::is_bad_ptr(weapon)) {
+        const auto weapon = BattleRole::user_weapon[CameraController::local_role];
+        if (util::is_bad_ptr(weapon)) {
+            roles.clear();
+            return;
+        }
+
+        const auto control = WeaponControl::so_weapon_control[weapon];
+        if (util::is_bad_ptr(control)) {
+            roles.clear();
+            return;
+        }
+
+        const auto array = std::move(SOWeaponControl::bullet_speed_and_gravity[control]->ToVector());
+        for (auto& value : array) {
+            bullet_gravity = BulletSpeedAndGravity::gravity[value];
+            bullet_speed = BulletSpeedAndGravity::bullet_speed[value];
+        }
+    } catch (...) {
+        roles.clear();
         return;
     }
 
