@@ -29,6 +29,10 @@ auto ESP::render() -> void {
         roles.clear();
     }
 
+    if (temp.empty()) {
+        return;
+    }
+
     const auto esp = ESPConfig::instance();
     auto lock = esp->mutex();
 

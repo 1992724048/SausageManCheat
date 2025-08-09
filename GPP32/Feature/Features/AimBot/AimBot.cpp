@@ -65,16 +65,20 @@ auto AimBot::render() -> void {
     };
     static LockCtx lock{};
 
-    const auto cfg = AimBotConfig::instance();
-    cfg->mutex();
-    if (!cfg->enable) {
-        return;
-    }
-
     std::vector<AimInfo, mi_stl_allocator<AimInfo>> temp;
     {
         std::lock_guard lg(mutex);
         temp = roles;
+    }
+
+    if (temp.empty()) {
+        return;
+    }
+
+    const auto cfg = AimBotConfig::instance();
+    cfg->mutex();
+    if (!cfg->enable) {
+        return;
     }
 
     ImDrawList* draw = ImGui::GetBackgroundDrawList();
@@ -161,10 +165,9 @@ auto AimBot::render() -> void {
             return;
         }
 
+        const auto cfg_mem = MemoryConfig::instance();
+        cfg_mem->mutex();
         try {
-            const auto cfg_mem = MemoryConfig::instance();
-            cfg_mem->mutex();
-
             if (cfg_mem->lock_role) {
                 if (!util::is_bad_ptr(lock.ptr)) {
                     BattleRole::is_clear[lock.ptr] = true;

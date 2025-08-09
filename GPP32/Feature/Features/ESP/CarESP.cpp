@@ -16,6 +16,10 @@ auto CarEsp::render() -> void {
         temp = std::move(cars);
     }
 
+    if (temp.empty()) {
+        return;
+    }
+
     const auto esp = ESPConfig::instance();
     auto lock = esp->mutex();
 

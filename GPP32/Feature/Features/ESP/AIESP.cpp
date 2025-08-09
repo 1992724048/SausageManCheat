@@ -15,6 +15,10 @@ auto AIESP::render() -> void {
         temp = std::move(ais);
     }
 
+    if (temp.empty()) {
+        return;
+    }
+
     const auto esp = ESPConfig::instance();
     auto lock = esp->mutex();
 

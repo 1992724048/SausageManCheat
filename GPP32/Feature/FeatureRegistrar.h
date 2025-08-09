@@ -23,21 +23,13 @@ public:
 
     virtual auto render() -> void {
         for (const auto& val : fetures | std::views::values) {
-            try {
-                val->render();
-            } catch (...) {
-                LOG_DEBUG << "在 render 捕获到致命错误!";
-            }
+            val->render();
         }
     }
 
     virtual auto update() -> void {
         for (const auto& val : fetures | std::views::values) {
-            try {
-                val->update();
-            } catch (...) {
-                LOG_DEBUG << "在 update 捕获到致命错误!";
-            }
+            val->update();
         }
     }
 
