@@ -2,13 +2,13 @@
      <img src="./Image/logo.png" width = "301" height = "130" alt="图片名称" align=center />
 </div>
 
-> [!CAUTION]警告
+> [!CAUTION]
 > 请勿用于商业行为，衍生作品发布需提供源代码
 
-> [!IMPORTANT] 欢迎加入
+> [!IMPORTANT]
 > 如果对此项目感兴趣，欢迎加入一起开发
 
-> [!TIP]交流群
+> [!TIP]
 > Q群1：838737409 \
 > Q群2：1047366290
 
