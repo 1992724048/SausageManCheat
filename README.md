@@ -1,3 +1,4 @@
+<meta name="msvalidate.01" content="83D2568AE3F4DC86F77D405A6A33D7EB" />
 <div  align="center">    
      <img src="./Image/logo.png" width = "301" height = "130" alt="图片名称" align=center />
 </div>
