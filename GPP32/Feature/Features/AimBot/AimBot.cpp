@@ -45,9 +45,8 @@ auto calculate_angles(const glm::vec3& _from_point, const glm::vec3& _to_point) 
         angle_yaw += 360.0f;
     }
 
-    float angle_pitch = glm::degrees(glm::asin(direction.y / glm::length(direction)));
-    angle_pitch = -angle_pitch;
-    angle_pitch = glm::clamp(angle_pitch, -90.0f, 90.0f);
+    float angle_pitch = -glm::degrees(glm::atan2(direction.y, glm::length(glm::vec2(direction.x, direction.z))));
+    angle_pitch = glm::clamp(angle_pitch, -65.0f, 75.0f);
 
     return glm::vec2(angle_yaw, angle_pitch);
 }
@@ -55,15 +54,15 @@ auto calculate_angles(const glm::vec3& _from_point, const glm::vec3& _to_point) 
 auto calc_quat(const glm::vec2 _euler) -> std::pair<glm::quat, glm::quat> {
     auto quaternion_x = glm::quat(glm::radians(glm::vec3(_euler.x, 0, 0)));
     auto quaternion_y = glm::quat(glm::radians(glm::vec3(0, _euler.y, 0)));
-    return {{quaternion_x.w, 0, quaternion_x.x, 0}, {1, quaternion_y.y, 0, 0}};
+    return {{quaternion_x.w, 0, quaternion_x.x, 0}, {quaternion_y.w, quaternion_y.y, 0, 0}};
 }
 
 auto AimBot::render() -> void {
-    struct LockCtx {
+    struct lock_ctx {
         BattleRole* ptr = nullptr;
         int64_t id = 0;
     };
-    static LockCtx lock{};
+    static lock_ctx lock{};
 
     std::vector<AimInfo, mi_stl_allocator<AimInfo>> temp;
     {
@@ -188,17 +187,11 @@ auto AimBot::render() -> void {
                 dist2 = 0;
             }
             const float flight_time = dist2 / bullet_speed;
-
             if (bullet_gravity != 0.f) {
                 target_pos.y += 0.5f * bullet_gravity * flight_time * flight_time;
             }
 
-            glm::vec2 angles = calculate_angles(CameraController::camera_pos, tgt->pos_head);
-            angles.x += dist * 0.000068;
-            if (angles.x > 360.f) {
-                angles.x -= 360.f;
-            }
-
+            glm::vec2 angles = calculate_angles(CameraController::camera_pos, target_pos);
             auto [xq_target, yq_target] = calc_quat(angles);
             if (cfg->speed <= 1.0f) {
                 x_q = xq_target;
@@ -207,7 +200,7 @@ auto AimBot::render() -> void {
             }
 
             const ESP::Role* role = ESP::instance()->local_role.load();
-            const float actual_speed = 10.0f - cfg->speed;
+            const float actual_speed = 10.1f - cfg->speed;
             if (!role) {
                 return;
             }

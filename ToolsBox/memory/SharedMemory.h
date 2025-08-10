@@ -18,11 +18,18 @@ public:
         if (!mutex) {
             throw std::runtime_error("Invalid mutex handle");
         }
-        const DWORD ret = WaitForSingleObject(mutex.get(), INFINITE);
-        if (ret != WAIT_OBJECT_0) {
-            throw std::runtime_error("Failed to acquire mutex");
+        switch (const DWORD ret = WaitForSingleObject(mutex.get(), INFINITE)) {
+        case WAIT_OBJECT_0:
+            locked = true;
+            break;
+        case WAIT_ABANDONED:
+            locked = true;
+            break;
+        case WAIT_FAILED:
+            throw std::runtime_error("WaitForSingleObject failed: " + std::to_string(GetLastError()));
+        default:
+            throw std::runtime_error("Unexpected WaitForSingleObject result: " + std::to_string(ret));
         }
-        locked = true;
     }
 
     ~SharedMemoryLock() {
@@ -32,7 +39,7 @@ public:
     }
 
     SharedMemoryLock(const SharedMemoryLock&) = delete;
-    auto operator=(const SharedMemoryLock&) -> SharedMemoryLock& = delete;
+    auto operator=(const SharedMemoryLock&) -> SharedMemoryLock & = delete;
 };
 
 class SharedMemory {
@@ -65,6 +72,12 @@ public:
             return std::nullopt;
         }
         return std::static_pointer_cast<T>(memorys[_name].second);
+    }
+
+    static auto release_mutex() -> void {
+        for (auto& [mem, mutex] : memorys | std::views::values) {
+            ReleaseMutex(mutex.second.get());
+        }
     }
 
     SharedMemory(const SharedMemory&) = delete;

@@ -5,6 +5,8 @@
 #include <TlHelp32.h>
 #include <cwctype>
 
+#include "memory/SharedMemory.h"
+
 namespace {
     auto iequals(std::wstring_view _a, std::wstring_view _b) -> bool {
         return _a.size() == _b.size() && std::ranges::equal(_a,
@@ -280,12 +282,14 @@ auto AppConfig::invoke(const flutter::MethodCall<>& _method_call, std::unique_pt
                        };
 
                        functions["inject"] = [&] {
+                           SharedMemory::release_mutex();
                            launch_injector();
                            _result->Success();
                        };
 
                        functions["close"] = [&] {
                            if (g_injector_handle) {
+                               SharedMemory::release_mutex();
                                TerminateProcess(g_injector_handle, 0);
                                CloseHandle(g_injector_handle);
                                g_injector_handle = nullptr;
