@@ -9,6 +9,13 @@ Memory::Memory() {}
 auto Memory::render() -> void {}
 
 auto Memory::update() -> void {
+    static auto last_gc_time = std::chrono::steady_clock::now();
+    const auto now = std::chrono::steady_clock::now();
+    if (now - last_gc_time >= 5min) {
+        II::GC::Collect();
+        last_gc_time = now;
+    }
+
     const auto cfg = MemoryConfig::instance();
     auto lock = cfg->mutex();
 
@@ -39,7 +46,7 @@ auto Memory::update() -> void {
             SOWeaponControl::has_auto_fire[control] = true;
         }
     } catch (...) {}
-
+    
     next1:
     return;
 }

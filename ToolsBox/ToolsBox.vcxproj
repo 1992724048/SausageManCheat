@@ -157,7 +157,7 @@
       </OutputManifestFile>
       <AdditionalManifestFiles>
       </AdditionalManifestFiles>
-      <GenerateCatalogFiles>false</GenerateCatalogFiles>
+      <GenerateCatalogFiles>true</GenerateCatalogFiles>
     </Manifest>
     <ManifestResourceCompile>
       <ResourceOutputFileName>$(IntDir)$(TargetName)$(TargetExt).manifest</ResourceOutputFileName>
@@ -246,7 +246,8 @@
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
-      <OutputManifestFile>$(IntDir)$(TargetName)$(TargetExt).manifest</OutputManifestFile>
+      <OutputManifestFile>
+      </OutputManifestFile>
       <AdditionalManifestFiles>
       </AdditionalManifestFiles>
       <GenerateCatalogFiles>true</GenerateCatalogFiles>

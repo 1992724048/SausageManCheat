@@ -18,12 +18,14 @@ public:
         glm::vec3 pos;
         glm::vec3 pos_head;
         glm::vec3 pos_neck;
+        glm::vec3 move_dir;
         float x_rot;
         float y_rot;
         bool dead;
     };
 
     std::mutex mutex;
+    util::Map<BattleRole*, glm::vec3> last_positions;
     std::vector<AimInfo, mi_stl_allocator<AimInfo>> roles;
     std::vector<AimInfo, mi_stl_allocator<AimInfo>> roles_commit;
     std::atomic<AimInfo*> local_role = nullptr;

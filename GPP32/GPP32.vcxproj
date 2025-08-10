@@ -162,6 +162,8 @@ tbbmalloc_proxy_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     <ClInclude Include=".class\PickItem\PickItem.h" />
     <ClInclude Include=".class\RoleControl\RoleControl.h" />
     <ClInclude Include=".class\RoleLogicClient\RoleLogicClient.h" />
+    <ClInclude Include=".class\RoleSkinManager\RoleSkinManager.h" />
+    <ClInclude Include=".class\SkinManager\SkinManager.h" />
     <ClInclude Include=".class\SOCarDataConfig\SOCarDataConfig.h" />
     <ClInclude Include=".class\SOWeaponControl\SOWeaponControl.h" />
     <ClInclude Include=".class\StartGame\StartGame.h" />
@@ -726,6 +728,8 @@ tbbmalloc_proxy_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     <ClCompile Include=".class\PickItem\PickItem.cpp" />
     <ClCompile Include=".class\RoleControl\RoleControl.cpp" />
     <ClCompile Include=".class\RoleLogicClient\RoleLogicClient.cpp" />
+    <ClCompile Include=".class\RoleSkinManager\RoleSkinManager.cpp" />
+    <ClCompile Include=".class\SkinManager\SkinManager.cpp" />
     <ClCompile Include=".class\SOCarDataConfig\SOCarDataConfig.cpp" />
     <ClCompile Include=".class\SOWeaponControl\SOWeaponControl.cpp" />
     <ClCompile Include=".class\StartGame\StartGame.cpp" />

@@ -33,7 +33,7 @@ public:
         float gravity = 0.f;
 
         try {
-            auto sg = speed_gravity[_bc]->ToVector()[0];
+            const auto sg = speed_gravity[_bc]->ToVector()[0];
             speed = BulletSpeedAndGravity::bullet_speed[sg];
             gravity = BulletSpeedAndGravity::gravity[sg];
         } catch (...) {}
@@ -41,24 +41,35 @@ public:
         if (mem->ballistics_tracking) {
             const auto aim = AimBot::instance();
             if (const auto target = aim->lock_role.load()) {
-                if (target) {
-                    const float dist = glm::distance(_fire_pos, target->pos_head);
-                    const float flight_time = dist / speed;
+                const float dist = glm::distance(_fire_pos, target->pos_head);
+
+                float flight_time = dist / speed;
+                float dt = 1.0f / ImGui::GetIO().Framerate;
+                glm::vec3 target_velocity = target->move_dir / dt;
+
+                for (int i = 0; i < 2; ++i) {
+                    glm::vec3 predicted_pos = target->pos_head + target_velocity * flight_time;
 
                     if (gravity != 0.f) {
-                        target->pos_head.y += 0.5f * gravity * flight_time * flight_time;
+                        predicted_pos.y += 0.5f * gravity * flight_time * flight_time;
                     }
 
-                    const glm::vec3 dir = glm::normalize(target->pos_head - _fire_pos);
-                    _rot = glm::quatLookAtLH(dir, glm::vec3(0, 1, 0));
+                    float new_dist = glm::distance(_fire_pos, predicted_pos);
+                    flight_time = new_dist / speed;
                 }
+
+                glm::vec3 final_pos = target->pos_head + target_velocity * flight_time;
+                if (gravity != 0.f) {
+                    final_pos.y += 0.5f * gravity * flight_time * flight_time;
+                }
+
+                glm::vec3 dir = glm::normalize(final_pos - _fire_pos);
+                _rot = glm::quatLookAtLH(dir, glm::vec3(0, 1, 0));
             }
         }
 
-    no_tg:
         return HardBreakPoint::call_origin(local_role_weapon_init_hook, _bc, _a, _b, _c, _d, _e, _f, _fire_pos, _rot);
     }
-
 
     static auto hit_role_hook(BulletControl* _i, BodyPart* _body) -> void {
         const auto mem = MemoryConfig::instance();

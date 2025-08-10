@@ -2,6 +2,7 @@
 
 #include <execution>
 #include <random>
+#include <unordered_set>
 
 #include ".class/BattleRole/BattleRole.h"
 #include ".class/CameraController/CameraController.h"
@@ -279,6 +280,7 @@ auto AimBot::update() -> void {
             }
 
             BattleRoleLogic* role_logic = BattleRole::role_logic[role];
+            _i.pos = pos_trans->GetPosition();
             _i.team = BattleRoleLogic::team[role_logic];
             const auto hp = BattleRoleLogic::hp[role_logic];
             const auto weak = BattleRoleLogic::weak[role_logic];
@@ -309,23 +311,34 @@ auto AimBot::process_data() -> void {
         if (value.local) {
             local_role = &value;
         }
+
+        if (last_positions.contains(value.real_ptr)) {
+            value.move_dir = value.pos - last_positions[value.real_ptr];
+        } else {
+            value.move_dir = glm::vec3(0.0f);
+        }
+   
+        last_positions[value.real_ptr] = value.pos;
     }
 
     try {
         if (util::is_bad_ptr(CameraController::local_role)) {
             roles.clear();
+            last_positions.clear();
             return;
         }
 
         const auto weapon = BattleRole::user_weapon[CameraController::local_role];
         if (util::is_bad_ptr(weapon)) {
             roles.clear();
+            last_positions.clear();
             return;
         }
 
         const auto control = WeaponControl::so_weapon_control[weapon];
         if (util::is_bad_ptr(control)) {
             roles.clear();
+            last_positions.clear();
             return;
         }
 
@@ -336,7 +349,22 @@ auto AimBot::process_data() -> void {
         }
     } catch (...) {
         roles.clear();
+        last_positions.clear();
         return;
+    }
+
+    {
+        std::unordered_set<BattleRole*> current_ptrs;
+        for (auto& v : temp) {
+            current_ptrs.insert(v.real_ptr);
+        }
+        for (auto it = last_positions.begin(); it != last_positions.end();) {
+            if (!current_ptrs.contains(it->first)) {
+                it = last_positions.erase(it);
+            } else {
+                ++it;
+            }
+        }
     }
 
     std::lock_guard lock_s(mutex);

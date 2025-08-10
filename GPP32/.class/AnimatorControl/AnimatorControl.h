@@ -1,11 +1,13 @@
 ﻿#pragma once
 #include "pch.h"
 #include ".class/ClassRegistrar.h"
+#include ".class/RoleSkinManager/RoleSkinManager.h"
 
 class AnimatorControl final : public II::MonoBehaviour, public ClassRegistrar<AnimatorControl> {
 public:
     inline static IF::Variable<AnimatorControl, II::Animator*> animator;
     inline static IF::Variable<AnimatorControl, II::Transform*> head;
+    inline static IF::Variable<AnimatorControl, RoleSkinManager*> role_skin_manager;
 
     inline static IC* class_;
 
@@ -16,5 +18,6 @@ public:
         class_ = I::Get("Assembly-CSharp.dll")->Get("AnimatorControl");
         animator.Init(class_->Get<IF>("animator"));
         head.Init(class_->Get<IF>("Headring"));
+        role_skin_manager.Init(class_->Get<IF>("roleSkinManager"));
     }
 };

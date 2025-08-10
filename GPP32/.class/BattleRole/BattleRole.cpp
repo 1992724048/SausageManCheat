@@ -24,7 +24,38 @@ auto BattleRole::get_all() -> void {
                     continue;
                 }
 
-                roles.push_back(BattleRoleLogic::get_role(role_lg));
+                auto role = BattleRoleLogic::get_role(role_lg);
+
+                if (util::is_bad_ptr(role)) {
+                    continue;
+                }
+
+                const auto control = role_control[role];
+                if (util::is_bad_ptr(control)) {
+                    continue;
+                }
+
+                const auto animator = RoleControl::animator_control[control];
+                if (util::is_bad_ptr(animator)) {
+                    continue;
+                }
+
+                const auto skin = AnimatorControl::role_skin_manager[animator];
+                if (util::is_bad_ptr(skin)) {
+                    continue;
+                }
+
+                const auto base_skin = RoleSkinManager::base_skin_manager[skin];
+                if (util::is_bad_ptr(base_skin)) {
+                    continue;
+                }
+
+                const auto root_bone = SkinManager::root_bone_data[base_skin];
+                if (util::is_bad_ptr(root_bone)) {
+                    continue;
+                }
+
+                roles.push_back(role);
             } catch (...) {}
         }
     } catch (...) {

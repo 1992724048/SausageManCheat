@@ -3542,6 +3542,19 @@ public:
             }
         };
 
+        struct GC {
+            static auto Collect() -> void {
+                static Method* method;
+                if (!method) {
+                    method = Get("mscorlib.dll")->Get("GC")->Get<Method>("Collect");
+                }
+                if (method) {
+                    return method->Invoke<void>();
+                }
+                return;
+            }
+        };
+
         template<typename Return, typename... Args>
         static auto Invoke(void* address, Args... args) -> Return {
 #if WINDOWS_MODE
@@ -3565,11 +3578,11 @@ public:
 
         for (const auto& pAssembly : assembly) {
             for (const auto& pClass : pAssembly->classes) {
-                io << std::format("\tnamespace: {}", name_map.contains(pClass->namespaze) ? "" : name_map[pClass->namespaze]);
+                io << std::format("\tnamespace: {}", name_map[pClass->namespaze]);
                 io << "\n";
-                io << std::format("\tAssembly: {}\n", name_map.contains(pAssembly->name) ? "" : name_map[pAssembly->name]);
-                io << std::format("\tAssemblyFile: {} \n", name_map.contains(pAssembly->file) ? "" : name_map[pAssembly->file]);
-                io << std::format("\tclass {}{} ", name_map[pClass->name], name_map.contains(pClass->parent) ? "" : " : " + name_map[pClass->parent]);
+                io << std::format("\tAssembly: {}\n", name_map[pAssembly->name]);
+                io << std::format("\tAssemblyFile: {} \n", name_map[pAssembly->file]);
+                io << std::format("\tclass {}{} ", name_map[pClass->name], " : " + name_map[pClass->parent]);
                 io << "{\n\n";
                 for (const auto& pField : pClass->fields) {
                     io << std::format("\t\t{:+#06X} | {}{} {};\n", pField.offset, pField.static_field ? "static " : "", name_map[pField.type->name], name_map[pField.name]);
