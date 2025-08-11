@@ -9,6 +9,7 @@ public:
     double rect_w;
     double rect_h;
     int hotkey;
+    bool random;
 
     AimBotConfig();
     ~AimBotConfig() = default;

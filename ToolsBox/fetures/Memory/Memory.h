@@ -14,6 +14,7 @@ public:
     config::Field<bool> f_damage_multi;
     config::Field<int> f_damage_multi_value;
     config::Field<bool> f_bullet_no_gravity;
+    config::Field<bool> f_random;
 
     METHODS_BEGIN
         METHOD_ADD(mem_get)

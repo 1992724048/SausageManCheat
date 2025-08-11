@@ -72,6 +72,7 @@ class _MemoryState extends State<Memory> with SingleTickerProviderStateMixin {
   }
 
   var f_damage_multi = false;
+  var f_ballistics_tracking = false;
 
   @override
   Widget build(BuildContext context) {
@@ -117,31 +118,64 @@ class _MemoryState extends State<Memory> with SingleTickerProviderStateMixin {
           //     ),
           //   ],
           // ),
-          CardModule(
-            icon: Symbols.recenter,
-            label: "弹道追踪",
-            description: "子弹生成后朝目标方向飞去 (需要开启自瞄才能工作)",
-            child: [
-              AsyncSwitch(
-                getter: () async {
-                  f_enable = await configData.invoke(
-                    "mem_get",
-                    params: {'field_name': 'f_ballistics_tracking'},
-                  );
-                  setState(() {});
-                  return f_enable;
-                },
-                setter: (value) async {
-                  f_enable = value;
-                  setState(() {});
-                  return await configData.invoke(
-                    "mem_set",
-                    params: {
-                      'field_name': 'f_ballistics_tracking',
-                      'value': value,
+          ExpandFadeWidget2(
+            isOpen: f_ballistics_tracking,
+            alwaysShow: CardModuleTiny(
+              icon: Symbols.recenter,
+              label: "弹道追踪",
+              description: "子弹生成后朝目标方向飞去 (需要开启自瞄才能工作)",
+              child: [
+                AsyncSwitch(
+                  getter: () async {
+                    f_ballistics_tracking = await configData.invoke(
+                      "mem_get",
+                      params: {'field_name': 'f_ballistics_tracking'},
+                    );
+                    setState(() {});
+                    return f_ballistics_tracking;
+                  },
+                  setter: (value) async {
+                    f_ballistics_tracking = value;
+                    setState(() {});
+                    return await configData.invoke(
+                      "mem_set",
+                      params: {
+                        'field_name': 'f_ballistics_tracking',
+                        'value': value,
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+            children: [
+              CardModuleTiny(
+                icon: Symbols.target,
+                label: "随机命中率",
+                description: "按头部(40%)，身体(40%)，空枪(20%)",
+                child: [
+                  AsyncSwitch(
+                    getter: () async {
+                      f_enable = await configData.invoke(
+                        "mem_get",
+                        params: {'field_name': 'f_random'},
+                      );
+                      setState(() {});
+                      return f_enable;
                     },
-                  );
-                },
+                    setter: (value) async {
+                      f_enable = value;
+                      setState(() {});
+                      return await configData.invoke(
+                        "mem_set",
+                        params: {
+                          'field_name': 'f_random',
+                          'value': value,
+                        },
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
@@ -189,7 +223,10 @@ class _MemoryState extends State<Memory> with SingleTickerProviderStateMixin {
                   setState(() {});
                   return await configData.invoke(
                     "mem_set",
-                    params: {'field_name': 'f_bullet_no_gravity', 'value': value},
+                    params: {
+                      'field_name': 'f_bullet_no_gravity',
+                      'value': value,
+                    },
                   );
                 },
               ),

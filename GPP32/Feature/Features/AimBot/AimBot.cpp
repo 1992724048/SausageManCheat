@@ -180,7 +180,36 @@ auto AimBot::render() -> void {
             glm::quat& x_q = CameraController::camera_rotation_x[CameraController::camera_controller];
             glm::quat& y_q = CameraController::camera_rotation_y[CameraController::camera_controller];
 
-            glm::vec3 target_pos = tgt->pos_head;
+            static BattleRole* last_target_ptr = nullptr;
+            static glm::vec3 offset(0.0f);
+            static float next_change_time = 0.0f;
+            static std::mt19937 gen(std::random_device{}());
+
+            if (cfg->random) {
+                float now_time = ImGui::GetTime();
+                bool need_new_offset = false;
+
+                if (tgt->real_ptr != last_target_ptr) {
+                    last_target_ptr = tgt->real_ptr;
+                    need_new_offset = true;
+                } else if (now_time >= next_change_time) {
+                    need_new_offset = true;
+                }
+
+                if (need_new_offset) {
+                    std::uniform_real_distribution time_dis(0.05f, 0.2f);
+                    next_change_time = now_time + time_dis(gen);
+
+                    std::uniform_real_distribution chance(0.0f, 1.0f);
+                    if (chance(gen) < 0.5f) {
+                        std::uniform_real_distribution jitter(-0.05f, 0.05f);
+                        offset = glm::vec3(jitter(gen), jitter(gen), jitter(gen));
+                    } else {
+                        offset = glm::vec3(0.0f);
+                    }
+                }
+            }
+            glm::vec3 target_pos = cfg->random ? tgt->pos_head + offset : tgt->pos_head;
 
             const float dist = glm::distance(local->pos_head, target_pos);
             float dist2 = dist - 2.0f;
@@ -201,7 +230,7 @@ auto AimBot::render() -> void {
             }
 
             const ESP::Role* role = ESP::instance()->local_role.load();
-            const float actual_speed = 10.1f - cfg->speed;
+            const float actual_speed = 12.1f - cfg->speed;
             if (!role) {
                 return;
             }
@@ -279,6 +308,11 @@ auto AimBot::update() -> void {
                 continue;
             }
 
+            const auto trans_hip = animator->GetBoneTransform(II::Animator::HumanBodyBones::Hips);
+            if (util::is_bad_ptr(trans)) {
+                continue;
+            }
+
             BattleRoleLogic* role_logic = BattleRole::role_logic[role];
             _i.pos = pos_trans->GetPosition();
             _i.team = BattleRoleLogic::team[role_logic];
@@ -290,6 +324,7 @@ auto AimBot::update() -> void {
             _i.falling = weak != 100 && hp == 0;
             _i.dead = weak == 0 && hp == 0;
             _i.pos_neck = trans_neck->GetPosition();
+            _i.pos_hip = trans_hip->GetPosition();
             glm::vec3 pos_head = trans->GetPosition();
             _i.pos_head = glm::mix(_i.pos_neck, pos_head, 0.65);
             _i.screen_pos.second = w2c->commit(_i.pos_head);
@@ -317,7 +352,7 @@ auto AimBot::process_data() -> void {
         } else {
             value.move_dir = glm::vec3(0.0f);
         }
-   
+
         last_positions[value.real_ptr] = value.pos;
     }
 

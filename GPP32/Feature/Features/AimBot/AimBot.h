@@ -18,6 +18,7 @@ public:
         glm::vec3 pos;
         glm::vec3 pos_head;
         glm::vec3 pos_neck;
+        glm::vec3 pos_hip;
         glm::vec3 move_dir;
         float x_rot;
         float y_rot;

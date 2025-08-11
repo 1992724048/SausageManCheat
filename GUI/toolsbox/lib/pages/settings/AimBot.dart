@@ -22,6 +22,7 @@ class AimBot extends StatefulWidget {
 
 class _AimBotState extends State<AimBot> with SingleTickerProviderStateMixin {
   bool f_enable = false;
+  bool f_random = false;
   final ScrollController controller = ScrollController();
 
   late AnimationController animationController;
@@ -138,8 +139,8 @@ class _AimBotState extends State<AimBot> with SingleTickerProviderStateMixin {
                         );
                       },
                       min: 1.00,
-                      max: 10.00,
-                      divisions: 900,
+                      max: 8.00,
+                      divisions: 700,
                       defaultValue: 1.00,
                       fixed: 2,
                       showLoading: true,
@@ -188,7 +189,7 @@ class _AimBotState extends State<AimBot> with SingleTickerProviderStateMixin {
                       child: [
                         AsyncNumberInput<int>(
                           getter: () async {
-                            final raw = await configData.invoke( 
+                            final raw = await configData.invoke(
                               "aim_get",
                               params: {'field_name': 'f_rect_w'},
                             );
@@ -225,6 +226,39 @@ class _AimBotState extends State<AimBot> with SingleTickerProviderStateMixin {
                               params: {
                                 'field_name': 'f_rect_h',
                                 'value': value.toInt(),
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                ExpandFadeContainer(
+                  title: "可选功能",
+                  children: [
+                    CardModuleTiny(
+                      icon: Symbols.hand_gesture,
+                      label: "随机抽动",
+                      description: "模拟手部移动抽动",
+                      child: [
+                        AsyncSwitch(
+                          getter: () async {
+                            f_random = await configData.invoke(
+                              "aim_get",
+                              params: {'field_name': 'f_random'},
+                            );
+                            setState(() {});
+                            return f_random;
+                          },
+                          setter: (value) async {
+                            f_random = value;
+                            setState(() {});
+                            return await configData.invoke(
+                              "aim_set",
+                              params: {
+                                'field_name': 'f_random',
+                                'value': value,
                               },
                             );
                           },

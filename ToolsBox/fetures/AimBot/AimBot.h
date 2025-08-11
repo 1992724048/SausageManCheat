@@ -7,6 +7,7 @@ public:
     ~AimBot() = default;
 
     config::Field<bool> f_enable;
+    config::Field<bool> f_random;
     config::Field<double> f_rect_w;
     config::Field<double> f_rect_h;
     config::Field<double> f_speed;

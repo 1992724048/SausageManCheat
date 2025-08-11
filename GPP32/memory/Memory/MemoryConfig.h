@@ -13,6 +13,7 @@ public:
     bool all_gun_auto;
     bool ballistics_tracking;
     bool bullet_no_gravity;
+    bool random;
 
     MemoryConfig();
     ~MemoryConfig() = default;

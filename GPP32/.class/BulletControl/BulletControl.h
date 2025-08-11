@@ -58,7 +58,30 @@ public:
                     flight_time = new_dist / speed;
                 }
 
-                glm::vec3 final_pos = target->pos_head + target_velocity * flight_time;
+                static std::random_device rd;
+                static std::mt19937 gen(rd());
+                static std::uniform_real_distribution dis(0.0f, 1.0f);
+                static std::uniform_real_distribution hit(0.0f, 1.0f);
+
+                float r = dis(gen);
+                float hit_pos = hit(gen);
+                glm::vec3 aim_point = target->pos_head;
+
+                if (mem->random) {
+                    if (r < 0.4f) {
+                        aim_point = target->pos_head;
+                    } else if (r < 0.8f) {
+                        aim_point = target->pos_hip;
+                    } else {
+                        if (r < 0.9f) {
+                            aim_point = target->pos_head + (hit_pos > 0.5f ? glm::vec3(1.5f, 0.0f, 0.0f) : glm::vec3(0.0f, 0.0f, 1.5f));
+                        } else {
+                            aim_point = target->pos_hip + (hit_pos < 0.5f ? glm::vec3(1.5f, 0.0f, 0.0f) : glm::vec3(0.0f, 0.0f, 1.5f));
+                        }
+                    }
+                }
+
+                glm::vec3 final_pos = aim_point + target_velocity * flight_time;
                 if (gravity != 0.f) {
                     final_pos.y += 0.5f * gravity * flight_time * flight_time;
                 }

@@ -14,4 +14,5 @@ auto AimBotConfig::config_callback() -> void {
     rect_h = i->f_rect_h;
     rect_w = i->f_rect_w;
     hotkey = i->f_hotkey;
+    random = i->f_random;
 }

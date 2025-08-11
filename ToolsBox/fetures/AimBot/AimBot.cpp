@@ -3,6 +3,7 @@
 
 AimBot::AimBot() :
 NFS(f_enable, "", "AimBot", true),
+NFS(f_random, "", "AimBot", false),
 NFS(f_speed, "", "AimBot", 1.0),
 NFS(f_rect_w, "", "AimBot", 800),
 NFS(f_rect_h, "", "AimBot", 600),
@@ -37,6 +38,10 @@ auto AimBot::aim_get(const flutter::MethodCall<>& _method_call, std::unique_ptr<
 
                        functions["f_hotkey"] = [&] {
                             _result->Success(flutter::EncodableValue(that->f_hotkey));
+                           };
+
+                       functions["f_random"] = [&] {
+                            _result->Success(flutter::EncodableValue(that->f_random));
                            };
                    });
 
@@ -73,6 +78,11 @@ auto AimBot::aim_set(const flutter::MethodCall<>& _method_call, std::unique_ptr<
 
     if (field_name == "f_hotkey") {
         that->f_hotkey = args.at(flutter::EncodableValue("value")).get<int>();
+        goto _return;
+    }
+
+    if (field_name == "f_random") {
+        that->f_random = args.at(flutter::EncodableValue("value")).get<bool>();
         goto _return;
     }
 

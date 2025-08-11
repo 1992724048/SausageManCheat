@@ -17,4 +17,5 @@ void MemoryConfig::config_callback() {
     all_gun_auto = i->f_all_gun_auto;
     ballistics_tracking = i->f_ballistics_tracking;
     bullet_no_gravity = i->f_bullet_no_gravity;
+    random = i->f_random;
 }
