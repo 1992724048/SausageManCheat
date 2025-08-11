@@ -145,8 +145,8 @@ auto ESP::update() -> void {
     }
 
     tbb::parallel_for(tbb::blocked_range<size_t>(0, roles_commit.size()),
-                      [&](const tbb::blocked_range<size_t>& range) {
-                          for (size_t i = range.begin(); i != range.end(); i++) {
+                      [&](const tbb::blocked_range<size_t>& _range) {
+                          for (size_t i = _range.begin(); i != _range.end(); i++) {
                               Role& _i = roles_commit[i];
                               try {
                                   BattleRoleLogic* role_logic = BattleRole::role_logic[_i.role];
@@ -167,17 +167,15 @@ auto ESP::update() -> void {
 }
 
 auto ESP::process_data() -> void {
-    std::vector<Role, mi_stl_allocator<Role>> temp = std::move(roles_commit);
-    roles_commit.clear();
-    if (temp.empty()) {
+    if (roles_commit.empty()) {
         return;
     }
 
     const auto w2c = W2C::instance();
-    tbb::parallel_for(tbb::blocked_range<size_t>(0, temp.size()),
+    tbb::parallel_for(tbb::blocked_range<size_t>(0, roles_commit.size()),
                       [&](const tbb::blocked_range<size_t>& _range) {
                           for (size_t i = _range.begin(); i != _range.end(); ++i) {
-                              Role& value = temp[i];
+                              Role& value = roles_commit[i];
 
                               value.screen_pos.first = w2c->pos_done[value.screen_pos.second];
                               value.screen_pos_top.first = w2c->pos_done[value.screen_pos_top.second];
@@ -203,7 +201,7 @@ auto ESP::process_data() -> void {
                       });
 
     std::lock_guard lock_s(mutex);
-    roles = std::move(temp);
+    roles = std::move(roles_commit);
 }
 
 auto ESP::process_box(const glm::vec3& _scale_,

@@ -4,7 +4,7 @@
 
 class SkinManager final : public II::MonoBehaviour, public ClassRegistrar<SkinManager> {
 public:
-    inline static IF::Variable<SkinManager, void*> root_bone_data;
+    inline static IF::Variable<SkinManager, II::Dictionary<II::String*, II::Transform*>*> root_bone_data;
 
     inline static IC* class_;
 

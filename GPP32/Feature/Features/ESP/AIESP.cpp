@@ -70,47 +70,41 @@ auto AIESP::update() -> void {
     }
 
     ais_commit.clear();
-    ais_commit.reserve(size);
+    ais_commit.resize(size);
     const auto w2c = W2C::instance();
 
     for (int i = 0; i < size; i++) {
+        auto& ai_ = ais_commit[i];
         try {
             const auto ai = ais_data->operator[](i);
             if (util::is_bad_ptr(ai)) {
                 continue;
             }
 
-            std::pair<glm::vec3, int> pos_;
             auto pos = RoleAILogic::position[ai];
-            pos_.first = pos;
-            pos_.second = w2c->commit(pos);
+            ai_.screen_pos.first = pos;
+            ai_.screen_pos.second = w2c->commit(pos);
 
-            float hp = RoleAILogic::hp[ai];
-            float weak = RoleAILogic::weak[ai];
+            ai_.hp = RoleAILogic::hp[ai];
+            ai_.weak = RoleAILogic::weak[ai];
 
-            util::String name = std::move(RoleAILogic::name[ai]->ToString());
-            if (name.empty()) {
-                continue;
-            }
-
-            ais_commit.emplace_back(std::move(name), hp, weak, pos_, pos);
+            ai_.name = std::move(RoleAILogic::name[ai]->ToString());
         } catch (...) {}
     }
 }
 
 auto AIESP::process_data() -> void {
-    std::vector<AI, mi_stl_allocator<AI>> temp = std::move(ais_commit);
-    if (temp.empty()) {
+    if (ais_commit.empty()) {
         return;
     }
 
     const auto w2c = W2C::instance();
-    for (auto& value : temp) {
+    for (auto& value : ais_commit) {
         value.screen_pos.first = w2c->pos_done[value.screen_pos.second];
     }
 
     std::lock_guard lock(mutex);
-    ais = std::move(temp);
+    ais = std::move(ais_commit);
 }
 
 auto AIESP::draw_info(ImDrawList* _bg, std::pair<glm::vec3, int> _screen_pos_, float& _hp, float& _weak, const util::String& _name) -> void {

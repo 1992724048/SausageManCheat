@@ -334,13 +334,12 @@ auto AimBot::update() -> void {
 }
 
 auto AimBot::process_data() -> void {
-    std::vector<AimInfo, mi_stl_allocator<AimInfo>> temp = std::move(roles_commit);
-    if (temp.empty()) {
+    if (roles_commit.empty()) {
         return;
     }
 
     const auto w2c = W2C::instance();
-    for (auto& value : temp) {
+    for (auto& value : roles_commit) {
         value.screen_pos.first = w2c->pos_done[value.screen_pos.second];
 
         if (value.local) {
@@ -389,8 +388,9 @@ auto AimBot::process_data() -> void {
     }
 
     {
-        std::unordered_set<BattleRole*> current_ptrs;
-        for (auto& v : temp) {
+        std::unordered_set<BattleRole*, std::hash<BattleRole*>, std::equal_to<BattleRole*>, mi_stl_allocator<BattleRole*>> current_ptrs;
+        current_ptrs.reserve(roles_commit.size());
+        for (auto& v : roles_commit) {
             current_ptrs.insert(v.real_ptr);
         }
         for (auto it = last_positions.begin(); it != last_positions.end();) {
@@ -403,5 +403,5 @@ auto AimBot::process_data() -> void {
     }
 
     std::lock_guard lock_s(mutex);
-    roles = std::move(temp);
+    roles = std::move(roles_commit);
 }

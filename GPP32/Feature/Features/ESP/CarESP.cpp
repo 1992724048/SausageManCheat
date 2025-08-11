@@ -71,10 +71,11 @@ auto CarEsp::update() -> void {
     }
 
     cars_commit.clear();
-    cars_commit.reserve(size);
+    cars_commit.resize(size);
     const auto w2c = W2C::instance();
 
-    for (int i = 0; i < size; ++i) {
+    for (int i = 0; i < size; i++) {
+        auto& car_ = cars_commit[i];
         try {
             const auto car = cars_data->operator[](i);
             if (util::is_bad_ptr(car)) {
@@ -94,39 +95,31 @@ auto CarEsp::update() -> void {
                 continue;
             }
 
-            std::pair<glm::vec3, int> pos_;
             auto pos = car_transform->GetPosition();
-            pos_.first = pos;
-            pos_.second = w2c->commit(pos);
+            car_.screen_pos.first = pos;
+            car_.screen_pos.second = w2c->commit(pos);
 
-            float hp = CarNetMirror::sync_hp[car_mirror];
-            float hp_max = CarNetMirror::sync_max_hp[car_mirror];
-            float oil = CarNetMirror::sync_oil_consumption[car_mirror];
-            float oil_max = CarNetMirror::sync_max_oil_consumption[car_mirror];
-
-            util::String name = std::move(::Car::car_data_id[car]->ToString());
-            if (name.empty()) {
-                continue;
-            }
-
-            cars_commit.emplace_back(std::move(name), pos_, hp, hp_max, oil, oil_max);
+            car_.hp = CarNetMirror::sync_hp[car_mirror];
+            car_.hp_max = CarNetMirror::sync_max_hp[car_mirror];
+            car_.oil = CarNetMirror::sync_oil_consumption[car_mirror];
+            car_.oil_max = CarNetMirror::sync_max_oil_consumption[car_mirror];
+            car_.name = std::move(::Car::car_data_id[car]->ToString());
         } catch (...) {}
     }
 }
 
 auto CarEsp::process_data() -> void {
-    std::vector<Car, mi_stl_allocator<Car>> temp = std::move(cars_commit);
-    if (temp.empty()) {
+    if (cars_commit.empty()) {
         return;
     }
 
     const auto w2c = W2C::instance();
-    for (auto& value : temp) {
+    for (auto& value : cars_commit) {
         value.screen_pos.first = w2c->pos_done[value.screen_pos.second];
     }
 
     std::lock_guard lock(mutex);
-    cars = std::move(temp);
+    cars = std::move(cars_commit);
 }
 
 auto CarEsp::draw_info(ImDrawList* _bg,

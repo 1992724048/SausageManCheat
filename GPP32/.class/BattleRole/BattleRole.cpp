@@ -55,6 +55,14 @@ auto BattleRole::get_all() -> void {
                     continue;
                 }
 
+                if (root_bone->iCount <= 0) {
+                    continue;
+                }
+
+                const auto trans = root_bone->GetValueByIndex(0);
+                if (util::is_bad_ptr(trans)) {
+                    continue;
+                }
                 roles.push_back(role);
             } catch (...) {}
         }

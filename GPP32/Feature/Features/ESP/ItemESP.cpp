@@ -85,43 +85,31 @@ auto ItemEsp::update() -> void {
                               }
 
                               const auto pickitems = std::move(item_list->ToArray()->ToVector());
-
-                              std::vector<Item, mi_stl_allocator<Item>> local_items;
-                              local_items.reserve(pickitems.size());
-
-                              for (const auto& pick_item : pickitems) {
-                                  if (util::is_bad_ptr(pick_item)) {
+                              per_index_results[_i].resize(pickitems.size());
+                              for (int j = 0; j < pickitems.size(); j++) {
+                                  auto& [name, screen_pos, id, type, num] = per_index_results[_i][j];
+                                  const auto address = pickitems[j];
+                                  if (util::is_bad_ptr(address)) {
                                       continue;
                                   }
 
-                                  const auto item_net = PickItem::my_pick_item_net[pick_item];
-                                  const auto item_config = PickItem::pick_item_data_config[pick_item];
+                                  const auto item_net = PickItem::my_pick_item_net[address];
+                                  const auto item_config = PickItem::pick_item_data_config[address];
                                   if (util::is_bad_ptr(item_net) || util::is_bad_ptr(item_config)) {
                                       continue;
                                   }
 
-                                  std::pair<glm::vec3, int> pos_;
-                                  auto pos = PickItem::pos[pick_item];
-                                  pos_.first = pos;
-                                  pos_.second = w2c->commit(pos);
+                                  auto pos = PickItem::pos[address];
+                                  screen_pos.first = pos;
+                                  screen_pos.second = w2c->commit(pos);
 
-                                  int64_t id = PickItemDataConfig::item_id[item_config];
-                                  int64_t type = PickItemDataConfig::item_type[item_config];
-                                  int num = PickItemNet::num[item_net];
-                                  util::String name = std::move(PickItemDataConfig::item_name[item_config]->ToString());
-
-                                  if (name.empty()) {
-                                      continue;
-                                  }
-
-                                  local_items.emplace_back(std::move(name), pos_, id, type, num);
+                                  id = PickItemDataConfig::item_id[item_config];
+                                  type = PickItemDataConfig::item_type[item_config];
+                                  num = PickItemNet::num[item_net];
+                                  name = std::move(PickItemDataConfig::item_name[item_config]->ToString());
                               }
-
-                              per_index_results[_i] = std::move(local_items);
                           } catch (...) {}
                       });
-
-    items_commit.clear();
 
     for (const auto& vec : per_index_results) {
         items_commit.insert(items_commit.end(), std::make_move_iterator(vec.begin()), std::make_move_iterator(vec.end()));
@@ -129,23 +117,22 @@ auto ItemEsp::update() -> void {
 }
 
 auto ItemEsp::process_data() -> void {
-    std::vector<Item, mi_stl_allocator<Item>> temp = std::move(items_commit);
-    if (temp.empty()) {
+    if (items_commit.empty()) {
         return;
     }
 
     const auto w2c = W2C::instance();
-    tbb::parallel_for(tbb::blocked_range<size_t>(0, temp.size()),
+    tbb::parallel_for(tbb::blocked_range<size_t>(0, items_commit.size()),
                       [&](const tbb::blocked_range<size_t>& _range) {
                           for (size_t i = _range.begin(); i != _range.end(); ++i) {
-                              Item& value = temp[i];
+                              Item& value = items_commit[i];
                               value.screen_pos.first = w2c->pos_done[value.screen_pos.second];
                           }
                       });
 
 
     std::lock_guard lock(mutex);
-    items = std::move(temp);
+    items = std::move(items_commit);
 }
 
 auto ItemEsp::draw_info(ImDrawList* _bg, const std::conditional_t<true, glm::vec3, int>& _screen_pos, util::String& _name, int64_t _id, int64_t _type, const int _num) -> void {
