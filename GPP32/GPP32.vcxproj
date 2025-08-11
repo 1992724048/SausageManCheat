@@ -172,6 +172,7 @@ tbbmalloc_proxy_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     <ClInclude Include="App\App.h" />
     <ClInclude Include="Feature\FeatureRegistrar.h" />
     <ClInclude Include="Feature\Features\AimBot\AimBot.h" />
+    <ClInclude Include="Feature\Features\AppInfo\Performance.h" />
     <ClInclude Include="Feature\Features\Debug\Debug.h" />
     <ClInclude Include="Feature\Features\ESP\AIESP.h" />
     <ClInclude Include="Feature\Features\ESP\CarESP.h" />
@@ -696,6 +697,7 @@ tbbmalloc_proxy_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     <ClInclude Include="Library\tbb\tbb\tbb_allocator.h" />
     <ClInclude Include="Library\tbb\tbb\tick_count.h" />
     <ClInclude Include="Library\tbb\tbb\version.h" />
+    <ClInclude Include="Library\thread_pool.hpp" />
     <ClInclude Include="Library\UnityResolve.hpp" />
     <ClInclude Include="memory\AimBot\AimBotConfig.h" />
     <ClInclude Include="memory\ESP\ESPConfig.h" />
@@ -738,6 +740,7 @@ tbbmalloc_proxy_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     <ClCompile Include="App\App.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Feature\Features\AimBot\AimBot.cpp" />
+    <ClCompile Include="Feature\Features\AppInfo\Performance.cpp" />
     <ClCompile Include="Feature\Features\Debug\Debug.cpp" />
     <ClCompile Include="Feature\Features\ESP\AIESP.cpp" />
     <ClCompile Include="Feature\Features\ESP\CarESP.cpp" />

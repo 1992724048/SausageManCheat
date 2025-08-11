@@ -68,12 +68,14 @@ public:
                 glm::vec3 aim_point = target->pos_head;
 
                 if (mem->random) {
-                    if (r < 0.4f) {
+                    if (r <= 0.40f) {
                         aim_point = target->pos_head;
-                    } else if (r < 0.8f) {
+                    } else if (r > 0.40f && r <= 0.60f) {
+                        aim_point = target->pos_neck;
+                    } else if (r > 0.60f && r <= 0.80f) {
                         aim_point = target->pos_hip;
                     } else {
-                        if (r < 0.9f) {
+                        if (r < 0.90f) {
                             aim_point = target->pos_head + (hit_pos > 0.5f ? glm::vec3(1.5f, 0.0f, 0.0f) : glm::vec3(0.0f, 0.0f, 1.5f));
                         } else {
                             aim_point = target->pos_hip + (hit_pos < 0.5f ? glm::vec3(1.5f, 0.0f, 0.0f) : glm::vec3(0.0f, 0.0f, 1.5f));

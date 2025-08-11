@@ -11,6 +11,7 @@
 #include "memory/W2C/W2C.h"
 
 class CameraController final : public II::MonoBehaviour, public ClassRegistrar<CameraController> {
+    inline static tp::TimeGuard tg_;
 public:
     inline static IF::Variable<CameraController, glm::quat> camera_rotation_x;
     inline static IF::Variable<CameraController, glm::quat> camera_rotation_y;
@@ -29,12 +30,16 @@ public:
     inline static StatisticsData* local_role_statistics;
 
     inline static IC* class_;
+    inline static std::shared_mutex rw_lock;
+    inline static float update_time;
 
     CameraController();
     ~CameraController();
 
     static auto update_hook(CameraController* _i) -> void {
         HardBreakPoint::call_origin(update_hook, _i);
+
+        tg_.update_start();
 
         const auto w2c = W2C::instance();
         w2c->wait();
@@ -99,6 +104,7 @@ public:
 
         FeatureBase::instance().update();
         w2c->start();
+        update_time = tg_.get_duration<std::chrono::milliseconds>();
     }
 
     auto init() -> void override {

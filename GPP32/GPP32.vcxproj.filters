@@ -1707,6 +1707,12 @@
     <ClInclude Include=".class\SkinManager\SkinManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Library\thread_pool.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Feature\Features\AppInfo\Performance.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -1896,6 +1902,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include=".class\SkinManager\SkinManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Feature\Features\AppInfo\Performance.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include <pch.h>
 
+#include "library/thread_pool.hpp"
+
 class FeatureBase {
 public:
     static auto get_count() -> size_t {
@@ -22,15 +24,21 @@ public:
     }
 
     virtual auto render() -> void {
+        render_tg_.update_start();
         for (const auto& val : fetures | std::views::values) {
             val->render();
         }
+        std::unique_lock lock(rw_lock);
+        render_time = render_tg_.get_duration<std::chrono::milliseconds>();
     }
 
     virtual auto update() -> void {
+        update_tg_.update_start();
         for (const auto& val : fetures | std::views::values) {
             val->update();
         }
+        std::unique_lock lock(rw_lock);
+        update_time = update_tg_.get_duration<std::chrono::milliseconds>();
     }
 
     template<class T>
@@ -46,6 +54,9 @@ public:
     FeatureBase(FeatureBase&&) = delete;
     auto operator=(FeatureBase&&) -> FeatureBase & = delete;
 
+    inline static std::shared_mutex rw_lock;
+    inline static float update_time;
+    inline static float render_time;
 protected:
     ~FeatureBase() = default;
     FeatureBase() = default;
@@ -58,6 +69,8 @@ protected:
     inline static std::vector<std::function<void()>> creates;
 
 private:
+    tp::TimeGuard update_tg_;
+    tp::TimeGuard render_tg_;
     inline static std::once_flag once_flag;
     inline static util::Map<std::string, std::shared_ptr<FeatureBase>> fetures;
 };
