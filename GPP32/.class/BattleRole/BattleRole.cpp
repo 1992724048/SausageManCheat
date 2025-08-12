@@ -25,44 +25,14 @@ auto BattleRole::get_all() -> void {
                 }
 
                 auto role = BattleRoleLogic::get_role(role_lg);
-
                 if (util::is_bad_ptr(role)) {
                     continue;
                 }
 
-                const auto control = role_control[role];
-                if (util::is_bad_ptr(control)) {
+                if (!role->GetGameObject()->GetActiveSelf()) {
                     continue;
                 }
 
-                const auto animator = RoleControl::animator_control[control];
-                if (util::is_bad_ptr(animator)) {
-                    continue;
-                }
-
-                const auto skin = AnimatorControl::role_skin_manager[animator];
-                if (util::is_bad_ptr(skin)) {
-                    continue;
-                }
-
-                const auto base_skin = RoleSkinManager::base_skin_manager[skin];
-                if (util::is_bad_ptr(base_skin)) {
-                    continue;
-                }
-
-                const auto root_bone = SkinManager::root_bone_data[base_skin];
-                if (util::is_bad_ptr(root_bone)) {
-                    continue;
-                }
-
-                if (root_bone->iCount <= 0) {
-                    continue;
-                }
-
-                const auto trans = root_bone->GetValueByIndex(0);
-                if (util::is_bad_ptr(trans)) {
-                    continue;
-                }
                 roles.push_back(role);
             } catch (...) {}
         }

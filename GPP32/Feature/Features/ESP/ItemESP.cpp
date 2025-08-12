@@ -136,6 +136,9 @@ auto ItemEsp::process_data() -> void {
 }
 
 auto ItemEsp::draw_info(ImDrawList* _bg, const std::conditional_t<true, glm::vec3, int>& _screen_pos, util::String& _name, int64_t _id, int64_t _type, const int _num) -> void {
+    if (_name.empty()) {
+        return;
+    }
     auto& [group, type, color] = info_list[_name];
     color.Value.w = 0.4f;
 

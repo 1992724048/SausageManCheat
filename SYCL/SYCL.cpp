@@ -100,8 +100,6 @@ auto CL::w2c(const std::vector<std::pair<int, glm::vec3>>& _pos, std::vector<std
         return;
     }
 
-    const glm::mat4x4 matrix = _camera_matrix;
-    const glm::vec2 size = _screen_size;
     const size_t pos_size = _pos.size();
 
     sycl::buffer in_buf(_pos.data(), sycl::range<1>(_pos.size()));
@@ -111,8 +109,8 @@ auto CL::w2c(const std::vector<std::pair<int, glm::vec3>>& _pos, std::vector<std
         const auto in = in_buf.get_access<sycl::access::mode::read>(_h);
         const auto out = out_buf.get_access<sycl::access::mode::write>(_h);
 
-        _h.parallel_for(sycl::range<1>(pos_size),
-                        [=](sycl::id<1> _idx) {
+        _h.parallel_for(sycl::range(pos_size),
+                        [=](sycl::id<> _idx) {
                             const int i = _idx[0];
                             auto& [id, pos] = in[i];
 

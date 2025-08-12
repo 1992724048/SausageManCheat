@@ -58,7 +58,6 @@ auto Performance::render() -> void {
     }
     last_update_tp = now;
 
-    low_dt_ms = 0.0;
     if (filled > 0) {
         std::vector tmp(samples.begin(), samples.begin() + filled);
         std::ranges::sort(tmp);
