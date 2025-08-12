@@ -19,7 +19,7 @@ public:
     std::vector<Item, mi_stl_allocator<Item>> items;
     std::vector<Item, mi_stl_allocator<Item>> items_commit;
 
-    static auto draw_info(ImDrawList* _bg, const std::conditional_t<true, glm::vec<3, float>, int>& _vec, util::String& _name, int64_t _int64_, int64_t _type, const int _num) -> void;
+    static auto draw_info(ImDrawList* _bg, const std::conditional_t<true, glm::vec<3, float>, int>& _screen_pos, util::String& _name, int64_t _id, int64_t _type, const int _num) -> void;
     auto render() -> void override;
     auto update() -> void override;
 

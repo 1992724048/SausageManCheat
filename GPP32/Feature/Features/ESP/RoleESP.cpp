@@ -292,8 +292,7 @@ auto ESP::draw_info(ImDrawList* _bg,
                     const util::String& _name,
                     const int64_t _team,
                     const float _weak,
-                    const float _hp,
-                    bool _falling) -> void {
+                    const float _hp, const bool _falling) -> void {
     const ImColor color(_falling ? ImColor(1.f, 0.f, 0.f, 0.5f) : random_color(_team, 0.5));
     const ImVec2 name_text_size = ImGui::CalcTextSize(_name.data());
 

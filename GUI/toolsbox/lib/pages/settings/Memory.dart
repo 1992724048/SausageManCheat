@@ -152,7 +152,7 @@ class _MemoryState extends State<Memory> with SingleTickerProviderStateMixin {
               CardModuleTiny(
                 icon: Symbols.target,
                 label: "随机命中率",
-                description: "按头部(40%)，身体(40%)，空枪(20%)",
+                description: "按头部(40%)，脖子(20%)，身体(20%)，空枪(20%)",
                 child: [
                   AsyncSwitch(
                     getter: () async {

@@ -46,18 +46,7 @@ auto Performance::render() -> void {
     ImGui::Begin("##topbar_only", nullptr, flags);
 
     ImGui::AlignTextToFramePadding();
-    ImGui::Text("%s", timestr);
-    ImGui::SameLine(0, 15);
-    ImGui::Text("FPS: %.1f", fps);
-    ImGui::SameLine(0, 15);
-    ImGui::Text(reinterpret_cast<const char*>(u8"平均: %.1f"), avg_fps);
-    ImGui::SameLine(0, 15);
-    ImGui::Text(reinterpret_cast<const char*>(u8"时间: %.3f ms"), frame_ms);
-    ImGui::SameLine(0, 15);
-    ImGui::Text("0.1%% FPS: %.1f", low_dt_ms);
-
-    ImGui::SameLine(0, 15);
-    ImGui::Text(reinterpret_cast<const char*>(u8"渲染: %.3f ms 更新: %.3f ms 用时: %.3f ms"), render_time_, update_time_, render_time_ + update_time_);
+    ImGui::Text(reinterpret_cast<const char*>(u8"%s FPS: %.1f 平均: %.1f 时间: %.3f ms, 0.1%% FPS: %.1f 渲染: %.3f ms 更新: %.3f ms 用时: %.3f ms"), timestr, fps, avg_fps, frame_ms, low_dt_ms, render_time_, update_time_, render_time_ + update_time_);
 
     ImGui::End();
 
@@ -85,7 +74,7 @@ auto Performance::render() -> void {
     for (int i = 0; i < filled; ++i) {
         avg_dt += samples[i];
     }
-    avg_fps = (filled > 0) ? (filled / avg_dt) : 0.0;
+    avg_fps = filled > 0 ? filled / avg_dt : 0.0;
 
     std::shared_lock lock(rw_lock);
     std::shared_lock lock2(CameraController::rw_lock);

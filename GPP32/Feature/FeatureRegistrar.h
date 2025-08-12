@@ -25,7 +25,7 @@ public:
 
     virtual auto render() -> void {
         render_tg_.update_start();
-        for (const auto& val : fetures | std::views::values) {
+        for (const auto& val : fetures_ptr) {
             val->render();
         }
         std::unique_lock lock(rw_lock);
@@ -34,7 +34,7 @@ public:
 
     virtual auto update() -> void {
         update_tg_.update_start();
-        for (const auto& val : fetures | std::views::values) {
+        for (const auto& val : fetures_ptr) {
             val->update();
         }
         std::unique_lock lock(rw_lock);
@@ -63,6 +63,7 @@ protected:
 
     static auto add_feature(const std::string& _name, const std::shared_ptr<FeatureBase>& _that) -> void {
         fetures[_name] = _that;
+        fetures_ptr.push_back(_that);
         LOG_DEBUG << "已添加功能->" << _name;
     }
 
@@ -73,6 +74,7 @@ private:
     tp::TimeGuard render_tg_;
     inline static std::once_flag once_flag;
     inline static util::Map<std::string, std::shared_ptr<FeatureBase>> fetures;
+    inline static std::vector<std::shared_ptr<FeatureBase>, mi_stl_allocator<std::shared_ptr<FeatureBase>>> fetures_ptr;
 };
 
 template<typename T>
