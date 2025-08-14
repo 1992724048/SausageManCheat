@@ -8,10 +8,10 @@
     using SharpCompress.Common;
 
     public class VerDat {
-        public string ToolsBox { get; set; }
-        public string GUI { get; set; }
-        public string SYCL { get; set; }
-        public string UPDATE { get; set; }
+        public string ToolsBox { get; }
+        public string GUI { get; }
+        public string SYCL { get; }
+        public string UPDATE { get; }
     }
 
     /// <summary>
@@ -39,21 +39,25 @@
         }
 
         void MainWindow_OnLoaded(object sender, RoutedEventArgs e) {
-            try {
-                if (File.Exists("ver.json")) {
-                    this.update_check();
-                } else {
-                    this.toolsbox_dw = true;
-                    this.gui_dw = true;
-                    this.sycl_dw = true;
-                    this.update_dw = true;
-                    this.max_dw = 4;
+            new Thread(() => {
+                Thread.Sleep(1000);
+                try {
+                    if (File.Exists("ver.json")) {
+                        this.update_check();
+                    } else {
+                        this.toolsbox_dw = true;
+                        this.gui_dw = true;
+                        this.sycl_dw = true;
+                        this.update_dw = true;
+                        this.max_dw = 4;
+                    }
+
                     this.download_file();
+                } catch (Exception exception) {
+                    MessageBox.Show(messageBoxText: exception.ToString(), caption: "致命错误!", button: MessageBoxButton.OK, icon: MessageBoxImage.Error);
+                    throw;
                 }
-            } catch (Exception exception) {
-                MessageBox.Show(messageBoxText: exception.ToString(), caption: "致命错误!", button: MessageBoxButton.OK, icon: MessageBoxImage.Error);
-                throw;
-            }
+            }).Start();
         }
 
         void download_file() {
@@ -64,20 +68,48 @@
 
             if (this.gui_dw) {
                 this.min_dw++;
+                download_gui();
             }
 
             if (this.sycl_dw) {
                 this.min_dw++;
+                download_sycl();
             }
 
             if (this.update_dw) {
                 this.min_dw++;
+                download_cheat();
             }
+
+            if (File.Exists("ver.json")) {
+                File.Delete("ver.json");
+            }
+
+            this.SetTips("更新完成!");
+            File.WriteAllText(path: "ver.json", contents: this._http.GetStringAsync("https://raw.githubusercontent.com/1992724048/SausageManCheat/refs/heads/master/ver.json").GetAwaiter().GetResult());
+
+            Thread.Sleep(5000);
+            Environment.Exit(0);
         }
 
         void download_toolsbox() {
-            _ = this.DownloadAsync(url: "", filePath: "", title: "正在下载启动器...", token: CancellationToken.None);
-            Extract7zAsync("./", "");
+            this.DownloadAsync(url: "https://raw.githubusercontent.com/1992724048/SausageManCheat/refs/heads/master/ToolsBox.7z", filePath: "update.7z", title: $"({this.min_dw}/{this.max_dw}) 正在下载启动器...", token: CancellationToken.None).Wait();
+            this.Extract7zAsync(archivePath: "update.7z", outDir: "./").Wait();
+        }
+        
+        void download_gui() {
+            this.DownloadAsync(url: "https://raw.githubusercontent.com/1992724048/SausageManCheat/refs/heads/master/gui.7z", filePath: "update.7z", title: $"({this.min_dw}/{this.max_dw}) 正在下载启动器界面...", token: CancellationToken.None).Wait();
+            this.Extract7zAsync(archivePath: "update.7z", outDir: "./").Wait();
+        }
+
+        void download_sycl() {
+            this.DownloadAsync(url: "https://raw.githubusercontent.com/1992724048/SausageManCheat/refs/heads/master/sycl.7z", filePath: "update.7z", title: $"({this.min_dw}/{this.max_dw}) 正在下载硬件加速...", token: CancellationToken.None).Wait();
+            this.Extract7zAsync(archivePath: "update.7z", outDir: "./").Wait();
+        }
+        
+        void download_cheat() {
+            this.DownloadAsync(url: "https://raw.githubusercontent.com/1992724048/SausageManCheat/refs/heads/master/cheat.7z", filePath: "update.7z", title: $"({this.min_dw}/{this.max_dw}) 正在下载硬件加速...", token: CancellationToken.None).Wait();
+            this.Extract7zAsync(archivePath: "update.7z", outDir: "./GamePlusPlus").Wait();
         }
 
         async Task DownloadAsync(string url, string filePath, string title, CancellationToken token) {
@@ -106,8 +138,8 @@
                 var eta = TimeSpan.FromSeconds((total - received) / speed);
 
                 this.Dispatcher.Invoke(() => {
-                    this.ProgressBar.Maximum = total;
-                    this.ProgressBar.Value = received;
+                    this.ProgressBar.Maximum = 100;
+                    this.ProgressBar.Value = received / total * 100.0f;
                     this.Tips.Content = $"步骤：{title} " + $"总大小：{MainWindow.Bytes(total)} " + $"已下载：{MainWindow.Bytes(received)} " + $"剩余时间：{eta:hh\\:mm\\:ss}";
                 });
             }
@@ -129,6 +161,10 @@
                     }
                 }
             });
+
+            if (File.Exists(archivePath)) {
+                File.Delete(archivePath);
+            }
 
             this.SetTips("解压完成！");
         }
@@ -173,7 +209,7 @@
 
         VerDat htpp_data() {
             var http = new HttpClient();
-            string json = this._http.GetStringAsync("https://example.com/api/version").GetAwaiter().GetResult();
+            string json = this._http.GetStringAsync("https://raw.githubusercontent.com/1992724048/SausageManCheat/refs/heads/master/ver.json").GetAwaiter().GetResult();
             VerDat? remote = JsonSerializer.Deserialize<VerDat>(json);
 
             if (remote is null) {
