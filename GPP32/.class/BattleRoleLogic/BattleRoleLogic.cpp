@@ -1,9 +1,5 @@
 ﻿#include "BattleRoleLogic.h"
 
-BattleRoleLogic::BattleRoleLogic() {
-    
-}
+BattleRoleLogic::BattleRoleLogic() {}
 
-BattleRoleLogic::~BattleRoleLogic() {
-    
-}
+BattleRoleLogic::~BattleRoleLogic() {}

@@ -1,9 +1,5 @@
 ﻿#include "RoleLogicClient.h"
 
-RoleLogicClient::RoleLogicClient() {
-    
-}
+RoleLogicClient::RoleLogicClient() {}
 
-RoleLogicClient::~RoleLogicClient() {
-    
-}
+RoleLogicClient::~RoleLogicClient() {}

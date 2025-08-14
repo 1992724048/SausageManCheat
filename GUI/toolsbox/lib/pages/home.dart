@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
 
 class HomePage extends StatefulWidget {
   @override
@@ -47,7 +49,21 @@ class CheckUpdateButton extends StatelessWidget {
             ],
           ),
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              final exePath = p.join(
+                Directory.current.path,
+                'UPDATE.exe',
+              );
+
+              Process.start(
+                exePath,
+                [],
+                workingDirectory: Directory.current.path,
+                runInShell: true,
+              );
+
+              exit(0);
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,

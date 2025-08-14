@@ -12,6 +12,7 @@
 
 class CameraController final : public II::MonoBehaviour, public ClassRegistrar<CameraController> {
     inline static tp::TimeGuard tg_;
+
 public:
     inline static IF::Variable<CameraController, glm::quat> camera_rotation_x;
     inline static IF::Variable<CameraController, glm::quat> camera_rotation_y;

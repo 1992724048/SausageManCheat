@@ -3,24 +3,24 @@
 #include ".class/ClassRegistrar.h"
 
 enum class BodyPartData {
-	None,
-	Head,
-	Face,
-	Body,
-	LeftHand,
-	RightHand,
-	Hip,
-	LeftLeg,
-	RightLeg,
-	Foot,
-	BodyEffect,
-	WeakHead,
-	Role,
-	WordPoint,
-	LockTarget,
-	CatLockTarget,
-	LHand,
-	RHand
+    None,
+    Head,
+    Face,
+    Body,
+    LeftHand,
+    RightHand,
+    Hip,
+    LeftLeg,
+    RightLeg,
+    Foot,
+    BodyEffect,
+    WeakHead,
+    Role,
+    WordPoint,
+    LockTarget,
+    CatLockTarget,
+    LHand,
+    RHand
 };
 
 class BodyPart final : public ClassRegistrar<BodyPart> {
@@ -34,6 +34,6 @@ public:
 
     auto init() -> void override {
         class_ = I::Get("Assembly-CSharp.dll")->Get("BodyPart", "*", "HitType");
-		body_type.Init(class_->Get<IF>("BodyType"));
+        body_type.Init(class_->Get<IF>("BodyType"));
     }
 };

@@ -11,11 +11,11 @@ public:
 
     static auto initialize() -> void {
         std::call_once(once_flag,
-            [] {
-                for (const std::function<void()>& function : creates) {
-                    function();
-                }
-            });
+                       [] {
+                           for (const std::function<void()>& function : creates) {
+                               function();
+                           }
+                       });
     }
 
     virtual auto init() -> void {};
@@ -29,9 +29,9 @@ public:
     }
 
     ClassBase(const ClassBase&) = delete;
-    auto operator=(const ClassBase&) -> ClassBase & = delete;
+    auto operator=(const ClassBase&) -> ClassBase& = delete;
     ClassBase(ClassBase&&) = delete;
-    auto operator=(ClassBase&&) -> ClassBase & = delete;
+    auto operator=(ClassBase&&) -> ClassBase& = delete;
 
 protected:
     ~ClassBase() = default;
@@ -57,9 +57,9 @@ public:
     }
 
     ClassRegistrar(const ClassRegistrar&) = delete;
-    auto operator=(const ClassRegistrar&) -> ClassRegistrar & = delete;
+    auto operator=(const ClassRegistrar&) -> ClassRegistrar& = delete;
     ClassRegistrar(ClassRegistrar&&) = delete;
-    auto operator=(ClassRegistrar&&) -> ClassRegistrar & = delete;
+    auto operator=(ClassRegistrar&&) -> ClassRegistrar& = delete;
 
 protected:
     ClassRegistrar() = default;

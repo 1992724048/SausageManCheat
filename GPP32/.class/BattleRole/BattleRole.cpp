@@ -36,9 +36,7 @@ auto BattleRole::get_all() -> void {
                 roles.push_back(role);
             } catch (...) {}
         }
-    } catch (...) {
-        
-    }
+    } catch (...) {}
 }
 
 BattleRole::BattleRole() {}
