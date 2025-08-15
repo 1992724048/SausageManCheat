@@ -26,7 +26,6 @@ public:
     };
 
     std::mutex mutex;
-    util::Map<BattleRole*, glm::vec3> last_positions;
     std::vector<AimInfo, mi_stl_allocator<AimInfo>> roles;
     std::vector<AimInfo, mi_stl_allocator<AimInfo>> roles_commit;
     std::atomic<AimInfo*> local_role = nullptr;

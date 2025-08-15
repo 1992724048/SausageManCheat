@@ -27,6 +27,7 @@ public:
         role_logic.Init(class_->Get<IF>("$a"));
         role_control.Init(class_->Get<IF>("MyRoleControl"));
         is_clear.Init(class_->Get<IF>("IsClear"));
+        user_weapon.Init(class_->Get<IF>("UserWeapon"));
         game_object.Init(class_->Get<IF>("LockTarget"));
         game_object.offset -= sizeof(glm::vec3);
         game_object.offset -= sizeof(void*);

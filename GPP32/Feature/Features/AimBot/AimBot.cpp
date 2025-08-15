@@ -345,61 +345,40 @@ auto AimBot::process_data() -> void {
         if (value.local) {
             local_role = &value;
         }
-
-        if (last_positions.contains(value.real_ptr)) {
-            value.move_dir = value.pos - last_positions[value.real_ptr];
-        } else {
-            value.move_dir = glm::vec3(0.0f);
-        }
-
-        last_positions[value.real_ptr] = value.pos;
     }
 
     try {
         if (util::is_bad_ptr(CameraController::local_role)) {
             roles.clear();
-            last_positions.clear();
             return;
         }
 
         const auto weapon = BattleRole::user_weapon[CameraController::local_role];
         if (util::is_bad_ptr(weapon)) {
             roles.clear();
-            last_positions.clear();
             return;
         }
 
         const auto control = WeaponControl::so_weapon_control[weapon];
         if (util::is_bad_ptr(control)) {
             roles.clear();
-            last_positions.clear();
             return;
         }
 
-        const auto array = std::move(SOWeaponControl::bullet_speed_and_gravity[control]->ToVector());
+        const auto weapon_array = SOWeaponControl::bullet_speed_and_gravity[control];
+        if (util::is_bad_ptr(weapon_array)) {
+            roles.clear();
+            return;
+        }
+
+        const auto array = std::move(weapon_array->ToVector());
         for (auto& value : array) {
             bullet_gravity = BulletSpeedAndGravity::gravity[value];
             bullet_speed = BulletSpeedAndGravity::bullet_speed[value];
         }
     } catch (...) {
         roles.clear();
-        last_positions.clear();
         return;
-    }
-
-    {
-        std::unordered_set<BattleRole*, std::hash<BattleRole*>, std::equal_to<BattleRole*>, mi_stl_allocator<BattleRole*>> current_ptrs;
-        current_ptrs.reserve(roles_commit.size());
-        for (auto& v : roles_commit) {
-            current_ptrs.insert(v.real_ptr);
-        }
-        for (auto it = last_positions.begin(); it != last_positions.end();) {
-            if (!current_ptrs.contains(it->first)) {
-                it = last_positions.erase(it);
-            } else {
-                ++it;
-            }
-        }
     }
 
     std::lock_guard lock_s(mutex);
