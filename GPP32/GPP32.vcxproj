@@ -153,6 +153,7 @@ tbbmalloc_proxy_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     <ClInclude Include=".class\CarNet\CarNet.h" />
     <ClInclude Include=".class\Car\Car.h" />
     <ClInclude Include=".class\BulletControl\BulletControl.h" />
+    <ClInclude Include=".class\Main\Main.h" />
     <ClInclude Include=".class\RoleAILogic\RoleAILogic.h" />
     <ClInclude Include=".class\RoleAIManager\RoleAIManager.h" />
     <ClInclude Include=".class\ClientCarFeatureManager\ClientCarFeatureManager.h" />
@@ -721,6 +722,7 @@ tbbmalloc_proxy_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     <ClCompile Include=".class\CarNet\CarNet.cpp" />
     <ClCompile Include=".class\Car\Car.cpp" />
     <ClCompile Include=".class\BulletControl\BulletControl.cpp" />
+    <ClCompile Include=".class\Main\Main.cpp" />
     <ClCompile Include=".class\RoleAILogic\RoleAILogic.cpp" />
     <ClCompile Include=".class\RoleAIManager\RoleAIManager.cpp" />
     <ClCompile Include=".class\ClientCarFeatureManager\ClientCarFeatureManager.cpp" />

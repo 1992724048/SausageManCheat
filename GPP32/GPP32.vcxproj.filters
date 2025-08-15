@@ -1713,6 +1713,9 @@
     <ClInclude Include="Feature\Features\AppInfo\Performance.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include=".class\Main\Main.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -1905,6 +1908,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Feature\Features\AppInfo\Performance.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include=".class\Main\Main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

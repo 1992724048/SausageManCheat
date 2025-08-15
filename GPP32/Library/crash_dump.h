@@ -70,12 +70,13 @@ public:
 class Crash {
 	inline static std::filesystem::path path_;
 public:
-	static auto init(std::filesystem::path path) -> void {
+	static auto init(const std::filesystem::path& path) -> void {
 		SetErrorMode(SEM_NOGPFAULTERRORBOX | SEM_FAILCRITICALERRORS | SEM_NOALIGNMENTFAULTEXCEPT);
 		SymInitialize(GetCurrentProcess(), nullptr, TRUE);
 		SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS | SYMOPT_LOAD_LINES);
 		SymSetSearchPathW(GetCurrentProcess(), L"srv*C:\\symbols*https://msdl.microsoft.com/download/symbols");
 		SetUnhandledExceptionFilter(unhandled_exception_filter_);
+		path_ = path;
 	}
 
 private:

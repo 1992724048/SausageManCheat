@@ -2278,14 +2278,8 @@ public:
             }
 
             auto GetGameObject() -> GameObject* {
-                static Method* method;
-                if (!method) {
-                    method = Get("UnityEngine.CoreModule.dll")->Get("Component")->Get<Method>("get_gameObject");
-                }
-                if (method) {
-                    return method->Invoke<GameObject*>(this);
-                }
-                return nullptr;
+                static Method* method = Get("UnityEngine.CoreModule.dll")->Get("Component")->Get<Method>("get_gameObject");
+                return method->Invoke<GameObject*>(this);
             }
 
             auto GetTag() -> String* {
@@ -2588,10 +2582,7 @@ public:
 
         struct Transform : Component {
             auto GetPosition() -> Vector3 {
-                static Method* method;
-                if (!method) {
-                    method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>("get_position");
-                }
+                static Method* method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>("get_position");
                 return method->Invoke<Vector3>(this);
             }
 
@@ -2969,15 +2960,8 @@ public:
             }
 
             auto GetActiveInHierarchy() -> bool {
-                static Method* method;
-
-                if (!method) {
-                    method = Get("UnityEngine.CoreModule.dll")->Get("GameObject")->Get<Method>("get_activeInHierarchy");
-                }
-                if (method) {
-                    return method->Invoke<bool>(this);
-                }
-                return false;
+                static Method* method = Get("UnityEngine.CoreModule.dll")->Get("GameObject")->Get<Method>("get_activeInHierarchy");
+                return method->Invoke<bool>(this);
             }
 
             auto GetIsStatic() -> bool {

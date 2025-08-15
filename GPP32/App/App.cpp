@@ -100,7 +100,6 @@ auto App::init_game_data() -> void {
     }
 
     game_handle = GetModuleHandle(L"GameAssembly.dll");
-
     UnityResolve::Init(game_handle, UnityResolve::Mode::Il2Cpp);
 
 }
@@ -111,6 +110,8 @@ auto App::init_cheat_data(HWND, ID3D11Device* pDevice, ID3D11DeviceContext*, IDX
         SharedMemory::initialize(true);
         FeatureBase::initialize();
         ClassBase::initialize();
+
+        ImGui::GetStyle().WindowBorderSize = 0;
     } catch (const std::exception& exception) {
         MessageBoxA(nullptr, std::format("{}\n请尝试重启启动器与游戏!", exception.what()).data(), "错误", 0);
     }

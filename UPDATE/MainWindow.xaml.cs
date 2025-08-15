@@ -1,9 +1,11 @@
 ﻿namespace UPDATE {
     using System.Diagnostics;
     using System.IO;
+    using System.Net;
     using System.Net.Http;
     using System.Text.Json;
     using System.Windows;
+
     using SharpCompress.Archives;
     using SharpCompress.Common;
 
@@ -86,30 +88,30 @@
             }
 
             this.SetTips("更新完成!");
-            File.WriteAllText(path: "ver.json", contents: this._http.GetStringAsync("https://raw.githubusercontent.com/1992724048/SausageManCheat/refs/heads/master/ver.json").GetAwaiter().GetResult());
+            File.WriteAllText(path: "ver.json", contents: this._http.GetStringAsync("https://1992724048.github.io/SausageManCheat/ver.json").GetAwaiter().GetResult());
 
             Thread.Sleep(5000);
             Environment.Exit(0);
         }
 
         void download_toolsbox() {
-            this.DownloadAsync(url: "https://raw.githubusercontent.com/1992724048/SausageManCheat/refs/heads/master/ToolsBox.7z", filePath: "update.7z", title: $"({this.min_dw}/{this.max_dw}) 正在下载启动器...", token: CancellationToken.None).Wait();
+            this.DownloadAsync(url: "https://1992724048.github.io/SausageManCheat/ToolsBox.7z", filePath: "update.7z", title: $"({this.min_dw}/{this.max_dw}) 正在下载启动器...", token: CancellationToken.None).Wait();
             this.Extract7zAsync(archivePath: "update.7z", outDir: "./").Wait();
         }
         
         void download_gui() {
-            this.DownloadAsync(url: "https://raw.githubusercontent.com/1992724048/SausageManCheat/refs/heads/master/gui.7z", filePath: "update.7z", title: $"({this.min_dw}/{this.max_dw}) 正在下载启动器界面...", token: CancellationToken.None).Wait();
+            this.DownloadAsync(url: "https://1992724048.github.io/SausageManCheat/gui.7z", filePath: "update.7z", title: $"({this.min_dw}/{this.max_dw}) 正在下载启动器界面...", token: CancellationToken.None).Wait();
             this.Extract7zAsync(archivePath: "update.7z", outDir: "./").Wait();
         }
 
         void download_sycl() {
-            this.DownloadAsync(url: "https://raw.githubusercontent.com/1992724048/SausageManCheat/refs/heads/master/sycl.7z", filePath: "update.7z", title: $"({this.min_dw}/{this.max_dw}) 正在下载硬件加速...", token: CancellationToken.None).Wait();
+            this.DownloadAsync(url: "https://1992724048.github.io/SausageManCheat/sycl.7z", filePath: "update.7z", title: $"({this.min_dw}/{this.max_dw}) 正在下载硬件加速...", token: CancellationToken.None).Wait();
             this.Extract7zAsync(archivePath: "update.7z", outDir: "./").Wait();
         }
         
         void download_cheat() {
-            this.DownloadAsync(url: "https://raw.githubusercontent.com/1992724048/SausageManCheat/refs/heads/master/cheat.7z", filePath: "update.7z", title: $"({this.min_dw}/{this.max_dw}) 正在下载硬件加速...", token: CancellationToken.None).Wait();
-            this.Extract7zAsync(archivePath: "update.7z", outDir: "./GamePlusPlus").Wait();
+            this.DownloadAsync(url: "https://1992724048.github.io/SausageManCheat/cheat.7z", filePath: "update.7z", title: $"({this.min_dw}/{this.max_dw}) 正在下载辅助...", token: CancellationToken.None).Wait();
+            this.Extract7zAsync(archivePath: "update.7z", outDir: "./").Wait();
         }
 
         async Task DownloadAsync(string url, string filePath, string title, CancellationToken token) {
@@ -138,15 +140,15 @@
                 var eta = TimeSpan.FromSeconds((total - received) / speed);
 
                 this.Dispatcher.Invoke(() => {
-                    this.ProgressBar.Maximum = 100;
-                    this.ProgressBar.Value = received / total * 100.0f;
+                    this.ProgressBar.Maximum = 100.0f;
+                    this.ProgressBar.Value = received / (float)total * 100.0f;
                     this.Tips.Content = $"步骤：{title} " + $"总大小：{MainWindow.Bytes(total)} " + $"已下载：{MainWindow.Bytes(received)} " + $"剩余时间：{eta:hh\\:mm\\:ss}";
                 });
             }
         }
 
         async Task Extract7zAsync(string archivePath, string outDir, string password = "") {
-            this.SetTips("步骤：正在解压…");
+            /*this.SetTips("步骤：正在解压…");
 
             await Task.Run(() => {
                 Directory.CreateDirectory(outDir);
@@ -166,7 +168,7 @@
                 File.Delete(archivePath);
             }
 
-            this.SetTips("解压完成！");
+            this.SetTips("解压完成！");*/
         }
 
 
@@ -181,35 +183,28 @@
                                        };
 
         void update_check() {
-            VerDat ver = JsonSerializer.Deserialize<VerDat>(File.ReadAllText("ver.json")) ?? throw new SystemException("解析版本失败! 请重新安装该程序!");
-            var tb = Version.Parse(ver.ToolsBox);
-            var gui = Version.Parse(ver.GUI);
-            var sycl = Version.Parse(ver.SYCL);
-            var upd = Version.Parse(ver.UPDATE);
-
+            var json = File.ReadAllText("ver.json");
+            VerDat ver = JsonSerializer.Deserialize<VerDat>(json) ?? throw new SystemException("解析版本失败! 请重新安装该程序!");
             VerDat remote = this.htpp_data();
-            var tb_rm = Version.Parse(remote.ToolsBox);
-            var gui_rm = Version.Parse(remote.GUI);
-            var sycl_rm = Version.Parse(remote.SYCL);
-            var upd_rm = Version.Parse(remote.UPDATE);
 
-            if (!this.check_ver(ver: tb, ver_rm: tb_rm)) {
+            if (!this.check_ver(ver: ver.ToolsBox, ver_rm: remote.ToolsBox)) {
                 this.toolsbox_dw = true;
             }
-            if (!this.check_ver(ver: gui, ver_rm: gui_rm)) {
+            if (!this.check_ver(ver: ver.GUI, ver_rm: remote.GUI)) {
                 this.gui_dw = true;
             }
-            if (!this.check_ver(ver: sycl, ver_rm: sycl_rm)) {
+            if (!this.check_ver(ver: ver.SYCL, ver_rm: remote.SYCL)) {
                 this.sycl_dw = true;
             }
-            if (!this.check_ver(ver: upd, ver_rm: upd_rm)) {
+            if (!this.check_ver(ver: ver.UPDATE, ver_rm: remote.UPDATE)) {
                 this.update_dw = true;
             }
         }
 
         VerDat htpp_data() {
-            var http = new HttpClient();
-            string json = this._http.GetStringAsync("https://raw.githubusercontent.com/1992724048/SausageManCheat/refs/heads/master/ver.json").GetAwaiter().GetResult();
+            this._http.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36");
+            this._http.DefaultRequestVersion = HttpVersion.Version11;
+            string json = this._http.GetStringAsync("https://1992724048.github.io/SausageManCheat/ver.json").GetAwaiter().GetResult();
             VerDat? remote = JsonSerializer.Deserialize<VerDat>(json);
 
             if (remote is null) {
@@ -219,7 +214,7 @@
             return remote;
         }
 
-        bool check_ver(Version ver, Version ver_rm) {
+        bool check_ver(string ver, string ver_rm) {
             if (ver == ver_rm) {
                 return true;
             }
