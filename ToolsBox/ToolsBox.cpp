@@ -11,6 +11,26 @@
 #include "memory/SharedMemory.h"
 #include "opencv2/world.hpp"
 
+class SingleInstance {
+public:
+    explicit SingleInstance(const wchar_t* name) : m_mutex(CreateMutexW(nullptr, TRUE, name)), m_last_error(GetLastError()) {}
+
+    ~SingleInstance() {
+        if (m_mutex) {
+            ReleaseMutex(m_mutex);
+            CloseHandle(m_mutex);
+        }
+    }
+
+    auto is_another_running() const -> bool {
+        return m_last_error == ERROR_ALREADY_EXISTS;
+    }
+
+private:
+    HANDLE m_mutex;
+    DWORD m_last_error;
+};
+
 static auto enable_debug_privilege() -> bool {
     HANDLE hToken = nullptr;
     TOKEN_PRIVILEGES tp;
@@ -64,6 +84,12 @@ auto is_windows_22h2_or_greater() -> bool {
 }
 
 auto wWinMain(HINSTANCE _instance, HINSTANCE _prev_instance, LPWSTR _cmd_line, int _cmd_show) -> int try {
+    SingleInstance guard(L"Global\\ToolsBoxGUI");
+    if (guard.is_another_running()) {
+        MessageBoxW(nullptr, L"请勿重复启动该程序!", L"提示", MB_ICONINFORMATION);
+        return 0;
+    }
+
     if (!is_windows_22h2_or_greater()) {
         MessageBoxW(nullptr, L"本程序需要 Windows 10 22H2 (19045) 或更高版本!", L"提示", MB_ICONINFORMATION);
         return EXIT_FAILURE;
