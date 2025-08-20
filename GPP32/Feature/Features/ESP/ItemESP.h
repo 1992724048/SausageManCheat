@@ -31,6 +31,7 @@ public:
         ImColor color;
     };
 
+    inline static util::Map<int64_t, ItemInfo*> info_list_id{};
     inline static util::Map<util::String, ItemInfo> info_list{
         {(const char*)u8"霰弹枪收束器", {(const char*)u8"配件", "", {255, 255, 255}}},
         {(const char*)u8"霰弹枪子弹袋", {(const char*)u8"配件", "", {255, 255, 255}}},

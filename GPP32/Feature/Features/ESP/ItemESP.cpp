@@ -5,7 +5,8 @@
 #include ".class/CameraController/CameraController.h"
 #include "memory/ESP/ESPConfig.h"
 
-ItemEsp::ItemEsp() {}
+ItemEsp::ItemEsp() {
+}
 
 auto ItemEsp::render() -> void {
     std::vector<Item, mi_stl_allocator<Item>> temp;
@@ -135,11 +136,17 @@ auto ItemEsp::process_data() -> void {
     items = std::move(items_commit);
 }
 
-auto ItemEsp::draw_info(ImDrawList* _bg, const std::conditional_t<true, glm::vec3, int>& _screen_pos, util::String& _name, int64_t _id, int64_t _type, const int _num) -> void {
+auto ItemEsp::draw_info(ImDrawList* _bg, const std::conditional_t<true, glm::vec3, int>& _screen_pos, util::String& _name, const int64_t _id, int64_t _type, const int _num) -> void {
     if (_name.empty()) {
         return;
     }
-    auto& [group, type, color] = info_list[_name];
+
+    ItemInfo*& item = info_list_id[_id];
+    if (!item) {
+        item = &info_list[_name];
+    }
+
+    auto& [group, type, color] = *item;
     color.Value.w = 0.4f;
 
     if (_num > 1) {

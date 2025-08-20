@@ -29,7 +29,7 @@ auto BattleRole::get_all() -> void {
                     continue;
                 }
 
-                if (!game_object[role]->GetActiveInHierarchy()) {
+                if (!game_object[role]->get_active_in_hierarchy()) {
                     continue;
                 }
 

@@ -65,6 +65,10 @@ auto ESP::render() -> void {
 
         ImDrawList* bg = ImGui::GetBackgroundDrawList();
         if (esp->show_role) {
+            /*if (role.hide) {
+                bg->AddText({role.screen_pos_top.first.x, role.screen_pos_top.first.y}, ImColor(255, 0, 0), reinterpret_cast<const char*>(u8"掩体后"));
+            }*/
+
             if (esp->show_info) {
                 screen_pos.y += 15;
                 draw_info(bg, screen_pos, role.name, role.team, role.weak, role.hp, role.falling);
@@ -74,7 +78,7 @@ auto ESP::render() -> void {
                 auto& [head, _id] = role.screen_pos_top;
                 auto& [neck, _id2] = role.screen_pos_neck;
                 const glm::vec2 pos_on_line = glm::mix(neck, head, 0.55);
-                bg->AddCircle({ pos_on_line.x, pos_on_line.y }, glm::distance(neck, head) / 2, ImColor(25, 255, 25));
+                bg->AddCircle({pos_on_line.x, pos_on_line.y}, glm::distance(neck, head) / 2, ImColor(25, 255, 25));
                 draw_bone(bg, role.bones);
             }
 
@@ -86,9 +90,13 @@ auto ESP::render() -> void {
 }
 
 auto ESP::update() -> void {
+    roles_commit.clear();
+    if (util::is_bad_ptr(local_role.load())) {
+        return;
+    }
+
     const auto w2c = W2C::instance();
     process_data();
-    roles_commit.clear();
     roles_commit.resize(BattleRole::roles.size());
 
     int index = 0;
@@ -200,6 +208,16 @@ auto ESP::process_data() -> void {
                           }
                       });
 
+    /*const auto local = local_role.load();
+    for (auto& role : roles_commit) {
+        try {
+            role.hide = II::Physics::raycast(local->pos,
+                                             role.pos,
+                                             glm::distance(local->bones[II::Animator::HumanBodyBones::Head].first, role.bones[II::Animator::HumanBodyBones::Head].first),
+                                             1 << 18 | 1 << 23 | 1 << 4);
+        } catch (...) {}
+    }*/
+
     std::lock_guard lock_s(mutex);
     roles = std::move(roles_commit);
 }
@@ -251,9 +269,7 @@ auto ESP::process_box(const glm::vec3& _scale_,
     }
 }
 
-auto ESP::process_bone(::UnityResolve::UnityType::Animator* _animator,
-                       util::Map<II::Animator::HumanBodyBones, std::pair<glm::vec3, int>>& _bones,
-                       std::pair<glm::vec3, int>& _pos_bottom) const -> void {
+auto ESP::process_bone(UnityResolve::UnityType::Animator* _animator, util::Map<II::Animator::HumanBodyBones, std::pair<glm::vec3, int>>& _bones, std::pair<glm::vec3, int>& _pos_bottom) const -> void {
     const auto w2c = W2C::instance();
     for (auto& enum_value : stick_figure_bones) {
         try {
@@ -292,7 +308,8 @@ auto ESP::draw_info(ImDrawList* _bg,
                     const util::String& _name,
                     const int64_t _team,
                     const float _weak,
-                    const float _hp, const bool _falling) -> void {
+                    const float _hp,
+                    const bool _falling) -> void {
     const ImColor color(_falling ? ImColor(1.f, 0.f, 0.f, 0.5f) : random_color(_team, 0.5));
     const ImVec2 name_text_size = ImGui::CalcTextSize(_name.data());
 

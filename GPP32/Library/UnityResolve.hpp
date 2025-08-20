@@ -104,6 +104,11 @@ public:
 
     enum class Mode : char { Il2Cpp, Mono, };
 
+    template<typename T>
+    static auto gc_get_handle(const uint32_t _handle) -> T* {
+        return Invoke<T*>("il2cpp_gchandle_get_target", _handle);
+    }
+
     struct Assembly final {
         void* address;
         int name;
@@ -1225,8 +1230,22 @@ public:
         };
 
         struct RaycastHit {
-            Vector3 m_Point;
-            Vector3 m_Normal;
+            glm::vec3 m_Point;
+            glm::vec3 m_Normal;
+            uint32_t m_FaceID;
+            float m_Distance;
+            glm::vec2 m_UV;
+            uint32_t m_Collider;
+
+            auto get_collider() -> Collider* {
+                static Method* method = Get("UnityEngine.PhysicsModule.dll")->Get("RaycastHit")->Get<Method>("get_collider");
+                return method->Invoke<Collider*>(this);
+            }
+
+            auto get_rigidbody() -> Rigidbody* {
+                static Method* method = Get("UnityEngine.PhysicsModule.dll")->Get("RaycastHit")->Get<Method>("get_rigidbody");
+                return method->Invoke<Rigidbody*>(this);
+            }
         };
 
         struct Rect {
@@ -1932,9 +1951,9 @@ public:
 
             static auto New(const util::String& str) -> String* {
                 if (mode_ == Mode::Il2Cpp) {
-                    return UnityResolve::Invoke<String*, const char*>("il2cpp_string_new", str.c_str());
+                    return UnityResolve::Invoke<String*, const char*>("il2cpp_string_new", str.data());
                 }
-                return UnityResolve::Invoke<String*, void*, const char*>("mono_string_new", UnityResolve::Invoke<void*>("mono_get_root_domain"), str.c_str());
+                return UnityResolve::Invoke<String*, void*, const char*>("mono_string_new", UnityResolve::Invoke<void*>("mono_get_root_domain"), str.data());
             }
         };
 
@@ -2277,7 +2296,7 @@ public:
                 return nullptr;
             }
 
-            auto GetGameObject() -> GameObject* {
+            auto get_game_object() -> GameObject* {
                 static Method* method = Get("UnityEngine.CoreModule.dll")->Get("Component")->Get<Method>("get_gameObject");
                 return method->Invoke<GameObject*>(this);
             }
@@ -2959,9 +2978,19 @@ public:
                 return false;
             }
 
-            auto GetActiveInHierarchy() -> bool {
+            auto get_active_in_hierarchy() -> bool {
                 static Method* method = Get("UnityEngine.CoreModule.dll")->Get("GameObject")->Get<Method>("get_activeInHierarchy");
                 return method->Invoke<bool>(this);
+            }
+
+            auto get_layer() -> int {
+                static Method* method = Get("UnityEngine.CoreModule.dll")->Get("GameObject")->Get<Method>("get_layer");
+                return method->Invoke<int>(this);
+            }
+
+            auto set_layer(const int layer) -> void {
+                static Method* method = Get("UnityEngine.CoreModule.dll")->Get("GameObject")->Get<Method>("set_layer");
+                return method->Invoke<void>(this, layer);
             }
 
             auto GetIsStatic() -> bool {
@@ -3089,15 +3118,9 @@ public:
                 return 0;
             }
 
-            static auto LayerToName(const int layer) -> String* {
-                static Method* method;
-                if (!method) {
-                    method = Get("UnityEngine.CoreModule.dll")->Get("LayerMask")->Get<Method>("LayerToName");
-                }
-                if (method) {
-                    return method->Invoke<String*>(layer);
-                }
-                return {};
+            static auto LayerToName(const int _layer) -> String* {
+                static Method* method = Get("UnityEngine.CoreModule.dll")->Get("LayerMask")->Get<Method>("LayerToName");
+                return method->Invoke<String*>(_layer);
             }
         };
 
@@ -3294,47 +3317,24 @@ public:
         struct MonoBehaviour : Behaviour {};
 
         struct Physics : Object {
-            static auto Linecast(const Vector3& start, const Vector3& end) -> bool {
-                static Method* method;
-                if (!method) {
-                    method = Get("UnityEngine.PhysicsModule.dll")->Get("Physics")->Get<Method>("Linecast", {"*", "*"});
-                }
-                if (method) {
-                    return method->Invoke<bool>(start, end);
-                }
-                return false;
+            static auto raycast(const Vector3& _origin, const Vector3& _direction, const float _max_distance, const int _layer_mask) -> bool {
+                static Method* method = Get("UnityEngine.PhysicsModule.dll")->Get("Physics")->Get<Method>("Raycast", {"UnityEngine.Vector3", "UnityEngine.Vector3", "System.Single", "System.Int32"});
+                return method->Invoke<bool>(_origin, _direction, _max_distance, _layer_mask);
             }
 
-            static auto Raycast(const Vector3& origin, const Vector3& direction, const float maxDistance) -> bool {
-                static Method* method;
-                if (!method) {
-                    method = Get("UnityEngine.PhysicsModule.dll")->Get("Physics")->Get<Method>("Raycast", {"UnityEngine.Vector3", "UnityEngine.Vector3", "System.Single"});
-                }
-                if (method) {
-                    return method->Invoke<bool>(origin, direction, maxDistance);
-                }
-                return false;
+            static auto ignore_collision(Collider* collider1, Collider* collider2) -> void {
+                static Method* method = Get("UnityEngine.PhysicsModule.dll")->Get("Physics")->Get<Method>("IgnoreCollision1", {"*", "*"});
+                return method->Invoke<void>(collider1, collider2);
             }
 
-            static auto Raycast(const Ray& origin, const RaycastHit* direction, const float maxDistance) -> bool {
-                static Method* method;
-                if (!method) {
-                    method = Get("UnityEngine.PhysicsModule.dll")->Get("Physics")->Get<Method>("Raycast", {"UnityEngine.Ray", "UnityEngine.RaycastHit&", "System.Single"});
-                }
-                if (method) {
-                    return method->Invoke<bool, Ray>(origin, direction, maxDistance);
-                }
-                return false;
+            static auto get_gravity() -> glm::vec3 {
+                static Method* method = Get("UnityEngine.PhysicsModule.dll")->Get("Physics")->Get<Method>("get_gravity");
+                return method->Invoke<glm::vec3>();
             }
 
-            static auto IgnoreCollision(Collider* collider1, Collider* collider2) -> void {
-                static Method* method;
-                if (!method) {
-                    method = Get("UnityEngine.PhysicsModule.dll")->Get("Physics")->Get<Method>("IgnoreCollision1", {"*", "*"});
-                }
-                if (method) {
-                    return method->Invoke<void>(collider1, collider2);
-                }
+            static auto set_gravity(const glm::vec3& _gravity) -> void {
+                static Method* method = Get("UnityEngine.PhysicsModule.dll")->Get("Physics")->Get<Method>("set_gravity");
+                return method->Invoke<void>(_gravity);
             }
         };
 

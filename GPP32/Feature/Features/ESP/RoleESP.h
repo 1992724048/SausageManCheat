@@ -30,6 +30,7 @@ public:
         RoleControl* role_control;
         BattleRoleLogic* role_logic;
         bool dead;
+        bool hide;
     };
 
     std::mutex mutex;

@@ -24,21 +24,27 @@ public:
     }
 
     virtual auto render() -> void {
-        render_tg_.update_start();
+        render_tg_all.update_start();
         for (const auto& val : fetures_ptr) {
+            //val->render_tg_.update_start();
             val->render();
+            //std::unique_lock lock(rw_lock);
+            //val->render_time = val->render_tg_.get_duration<std::chrono::milliseconds>();
         }
-        std::unique_lock lock(rw_lock);
-        render_time = render_tg_.get_duration<std::chrono::milliseconds>();
+        std::unique_lock lock(rw_lock_all);
+        render_time_all = render_tg_all.get_duration<std::chrono::milliseconds>();
     }
 
     virtual auto update() -> void {
-        update_tg_.update_start();
+        update_tg_all.update_start();
         for (const auto& val : fetures_ptr) {
+            //val->update_tg_.update_start();
             val->update();
+            //std::unique_lock lock(rw_lock);
+            //val->update_time = val->update_tg_.get_duration<std::chrono::milliseconds>();
         }
-        std::unique_lock lock(rw_lock);
-        update_time = update_tg_.get_duration<std::chrono::milliseconds>();
+        std::unique_lock lock(rw_lock_all);
+        update_time_all = update_tg_all.get_duration<std::chrono::milliseconds>();
     }
 
     template<class T>
@@ -54,9 +60,13 @@ public:
     FeatureBase(FeatureBase&&) = delete;
     auto operator=(FeatureBase&&) -> FeatureBase & = delete;
 
-    inline static std::shared_mutex rw_lock;
-    inline static float update_time;
-    inline static float render_time;
+    //std::shared_mutex rw_lock;
+    //float update_time;
+    //float render_time;
+
+    inline static std::shared_mutex rw_lock_all;
+    inline static float update_time_all;
+    inline static float render_time_all;
 protected:
     ~FeatureBase() = default;
     FeatureBase() = default;
@@ -72,6 +82,8 @@ protected:
 private:
     tp::TimeGuard update_tg_;
     tp::TimeGuard render_tg_;
+    inline static tp::TimeGuard update_tg_all;
+    inline static tp::TimeGuard render_tg_all;
     inline static std::once_flag once_flag;
     inline static util::Map<std::string, std::shared_ptr<FeatureBase>> fetures;
     inline static std::vector<std::shared_ptr<FeatureBase>, mi_stl_allocator<std::shared_ptr<FeatureBase>>> fetures_ptr;

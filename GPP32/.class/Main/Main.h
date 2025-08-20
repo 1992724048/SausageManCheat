@@ -95,7 +95,7 @@ public:
 
     auto init() -> void override {
         class_ = I::Get("Assembly-CSharp.dll")->Get("Main");
-        class_->Get<IM>("LateUpdate")->Cast(update);
+        class_->Get<IM>("Update")->Cast(update);
         HardBreakPoint::set_break_point(update, update_hook);
     }
 };

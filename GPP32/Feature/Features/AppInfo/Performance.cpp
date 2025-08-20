@@ -10,7 +10,6 @@ auto Performance::render() -> void {
     static double avg_fps;
     static double frame_ms;
     static float fps;
-    static float low_dt_ms;
     static float render_time_;
     static float update_time_;
 
@@ -46,7 +45,7 @@ auto Performance::render() -> void {
     ImGui::Begin("##topbar_only", nullptr, flags);
 
     ImGui::AlignTextToFramePadding();
-    ImGui::Text(reinterpret_cast<const char*>(u8"%s FPS: %.1f 平均: %.1f 时间: %.3f ms, 0.1%% FPS: %.1f 渲染: %.3f ms 更新: %.3f ms 用时: %.3f ms"), timestr, fps, avg_fps, frame_ms, low_dt_ms, render_time_, update_time_, render_time_ + update_time_);
+    ImGui::Text(reinterpret_cast<const char*>(u8"%s FPS: %.1f 平均: %.1f 时间: %.3f ms, 渲染: %.3f ms 更新: %.3f ms 用时: %.3f ms"), timestr, fps, avg_fps, frame_ms, render_time_, update_time_, render_time_ + update_time_);
 
     ImGui::End();
 
@@ -58,14 +57,6 @@ auto Performance::render() -> void {
     }
     last_update_tp = now;
 
-    if (filled > 0) {
-        std::vector tmp(samples.begin(), samples.begin() + filled);
-        std::ranges::sort(tmp);
-        constexpr double p = 0.999;
-        const int idx = std::clamp(static_cast<int>(std::ceil(p * filled)) - 1, 0, filled - 1);
-        low_dt_ms = tmp[idx] * 1000.0;
-    }
-
     fps = ImGui::GetIO().Framerate;
     frame_ms = dt * 1000.0;
 
@@ -75,10 +66,10 @@ auto Performance::render() -> void {
     }
     avg_fps = filled > 0 ? filled / avg_dt : 0.0;
 
-    std::shared_lock lock(rw_lock);
+    std::shared_lock lock(rw_lock_all);
     std::shared_lock lock2(CameraController::rw_lock);
     update_time_ = CameraController::update_time;
-    render_time_ = render_time;
+    render_time_ = render_time_all;
 }
 
 auto Performance::update() -> void {}
