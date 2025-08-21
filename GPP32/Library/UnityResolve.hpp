@@ -104,11 +104,6 @@ public:
 
     enum class Mode : char { Il2Cpp, Mono, };
 
-    template<typename T>
-    static auto gc_get_handle(const uint32_t _handle) -> T* {
-        return Invoke<T*>("il2cpp_gchandle_get_target", _handle);
-    }
-
     struct Assembly final {
         void* address;
         int name;
@@ -2282,6 +2277,12 @@ public:
                     return method->Invoke<void>(original);
                 }
             }
+
+            template<typename T>
+            static auto find_object_from_instance_id(const int32_t _instance_id) -> T {
+                static Method* method = Get("UnityEngine.CoreModule.dll")->Get("Object")->Get<Method>("FindObjectFromInstanceID");
+                return method->Invoke<T>(_instance_id);
+            }
         };
 
         struct Component : UnityObject {
@@ -2404,7 +2405,7 @@ public:
             }
 
             template<typename T>
-            auto GetComponentInParent(Class* pClass) -> T {
+            auto get_component_in_parent(Class* pClass) -> T {
                 static Method* method;
                 if (!method) {
                     method = Get("UnityEngine.CoreModule.dll")->Get("Component")->Get<Method>("GetComponentInParent", {"System.Type"});
@@ -3065,15 +3066,9 @@ public:
             }
 
             template<typename T>
-            auto GetComponentInParent(Class* type) -> T {
-                static Method* method;
-                if (!method) {
-                    method = Get("UnityEngine.CoreModule.dll")->Get("GameObject")->Get<Method>("GetComponentInParent", {"System.Type"});
-                }
-                if (method) {
-                    return method->Invoke<T>(this, type->GetType());
-                }
-                return T();
+            auto GetComponentInParent(Class* _type) -> T {
+                static Method* method = Get("UnityEngine.CoreModule.dll")->Get("GameObject")->Get<Method>("GetComponentInParent", {"System.Type"});
+                return method->Invoke<T>(this, _type->GetType());
             }
 
             template<typename T>
@@ -3317,9 +3312,14 @@ public:
         struct MonoBehaviour : Behaviour {};
 
         struct Physics : Object {
-            static auto raycast(const Vector3& _origin, const Vector3& _direction, const float _max_distance, const int _layer_mask) -> bool {
-                static Method* method = Get("UnityEngine.PhysicsModule.dll")->Get("Physics")->Get<Method>("Raycast", {"UnityEngine.Vector3", "UnityEngine.Vector3", "System.Single", "System.Int32"});
-                return method->Invoke<bool>(_origin, _direction, _max_distance, _layer_mask);
+            static auto raycast_all(const Vector3& _origin, const Vector3& _direction) -> Array<RaycastHit>* {
+                static Method* method = Get("UnityEngine.PhysicsModule.dll")->Get("Physics")->Get<Method>("RaycastAll", {"UnityEngine.Vector3", "UnityEngine.Vector3"});
+                return method->Invoke<Array<RaycastHit>*>(_origin, _direction);
+            }
+
+            static auto linecast(const Vector3& _origin, const Vector3& _direction, RaycastHit& _hit) -> bool {
+                static Method* method = Get("UnityEngine.PhysicsModule.dll")->Get("Physics")->Get<Method>("Linecast", {"UnityEngine.Vector3", "UnityEngine.Vector3", "UnityEngine.RaycastHit&"});
+                return method->Invoke<bool, const Vector3, const Vector3, RaycastHit&>(_origin, _direction, _hit);
             }
 
             static auto ignore_collision(Collider* collider1, Collider* collider2) -> void {
@@ -3536,6 +3536,11 @@ public:
                     return method->Invoke<void>();
                 }
                 return;
+            }
+
+            template<typename T>
+            static auto gc_get_handle(const uint32_t _handle) -> T* {
+                return UnityResolve::Invoke<T*>("il2cpp_gchandle_get_target", _handle);
             }
         };
 

@@ -19,9 +19,13 @@ public:
         std::pair<glm::vec3, int> screen_pos;
         std::pair<glm::vec3, int> screen_pos_top;
         std::pair<glm::vec3, int> screen_pos_neck;
+        std::pair<glm::vec3, int> screen_pos_head;
         util::Map<II::Animator::HumanBodyBones, std::pair<glm::vec3, int>> bones;
         glm::vec3 scale;
         glm::vec3 pos;
+        glm::vec3 head;
+        glm::vec3 head_top;
+        glm::vec3 neck;
         std::array<std::pair<glm::vec3, int>, 16> rect_pos_upper;
         std::array<std::pair<glm::vec3, int>, 16> rect_pos_lower;
         float x_rot;

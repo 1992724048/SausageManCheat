@@ -65,20 +65,16 @@ auto ESP::render() -> void {
 
         ImDrawList* bg = ImGui::GetBackgroundDrawList();
         if (esp->show_role) {
-            /*if (role.hide) {
-                bg->AddText({role.screen_pos_top.first.x, role.screen_pos_top.first.y}, ImColor(255, 0, 0), reinterpret_cast<const char*>(u8"掩体后"));
-            }*/
-
             if (esp->show_info) {
                 screen_pos.y += 15;
                 draw_info(bg, screen_pos, role.name, role.team, role.weak, role.hp, role.falling);
             }
 
             if (esp->show_bone && !role.falling) {
-                auto& [head, _id] = role.screen_pos_top;
+                auto& [top, _id] = role.screen_pos_top;
                 auto& [neck, _id2] = role.screen_pos_neck;
-                const glm::vec2 pos_on_line = glm::mix(neck, head, 0.55);
-                bg->AddCircle({pos_on_line.x, pos_on_line.y}, glm::distance(neck, head) / 2, ImColor(25, 255, 25));
+                auto& [head, _id3] = role.screen_pos_head;
+                bg->AddCircle({ head.x, head.y }, glm::distance(neck, top) / 2.2f, role.hide ? ImColor(255, 25, 25) : ImColor(25, 255, 25));
                 draw_bone(bg, role.bones);
             }
 
@@ -136,11 +132,16 @@ auto ESP::update() -> void {
             }
 
             _i.pos = pos_trans->GetPosition();
+            _i.head_top = head->GetPosition();
+            _i.neck = neck->GetPosition();
+            _i.head = glm::mix(_i.neck, _i.head_top, 0.7);
             _i.scale = pos_trans->GetLocalScale();
             std::pair<glm::vec3, int> pos_bottom;
             process_bone(animator, _i.bones, pos_bottom);
-            _i.screen_pos_top.first = head->GetPosition() + glm::vec3(0, 0.1f, 0);
+            _i.screen_pos_top.first = _i.head_top;
             _i.screen_pos_top.second = w2c->commit(_i.screen_pos_top.first);
+            _i.screen_pos_head.first = _i.head;
+            _i.screen_pos_head.second = w2c->commit(_i.screen_pos_head.first);
             _i.pos.y = pos_bottom.first.y - 0.1f;
             _i.screen_pos.second = w2c->commit(_i.pos);
             _i.screen_pos_neck.first = neck->GetPosition();
@@ -184,6 +185,7 @@ auto ESP::process_data() -> void {
                               value.screen_pos.first = w2c->pos_done[value.screen_pos.second];
                               value.screen_pos_top.first = w2c->pos_done[value.screen_pos_top.second];
                               value.screen_pos_neck.first = w2c->pos_done[value.screen_pos_neck.second];
+                              value.screen_pos_head.first = w2c->pos_done[value.screen_pos_head.second];
 
                               for (auto enum_value : magic_enum::enum_values<II::Animator::HumanBodyBones>()) {
                                   auto& [screen_pos, pos_id] = value.bones[enum_value];
@@ -204,15 +206,33 @@ auto ESP::process_data() -> void {
                           }
                       });
 
-    /*const auto local = local_role.load();
+    const auto local = local_role.load();
     for (auto& role : roles_commit) {
+        if (role.local) {
+            continue;
+        }
+
+        role.hide = true;
+
         try {
-            role.hide = II::Physics::raycast(local->pos,
-                                             role.pos,
-                                             glm::distance(local->bones[II::Animator::HumanBodyBones::Head].first, role.bones[II::Animator::HumanBodyBones::Head].first),
-                                             1 << 18 | 1 << 23 | 1 << 4);
+            II::RaycastHit hit;
+            if (!II::Physics::linecast(local->head, role.head, hit)) {
+                continue;
+            }
+
+            const auto collider = II::UnityObject::find_object_from_instance_id<II::Collider*>(hit.m_Collider);
+            if (util::is_bad_ptr(collider)) {
+                continue;
+            }
+
+            const auto role_ptr = collider->get_component_in_parent<BattleRole*>(BattleRole::class_);
+            if (util::is_bad_ptr(role_ptr) || local->role == role_ptr || role_ptr != role.role) {
+                continue;
+            }
+
+            role.hide = false;
         } catch (...) {}
-    }*/
+    }
 
     std::lock_guard lock_s(mutex);
     roles = std::move(roles_commit);

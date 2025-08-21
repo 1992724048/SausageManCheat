@@ -23,6 +23,7 @@ public:
         float x_rot;
         float y_rot;
         bool dead;
+        bool hide;
     };
 
     std::mutex mutex;

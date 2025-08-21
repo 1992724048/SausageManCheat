@@ -107,7 +107,7 @@ auto AimBot::render() -> void {
             }
         }
 
-        if (a.local || a.team == local->team) {
+        if (a.hide || a.local || a.team == local->team) {
             continue;
         }
         if (a.screen_pos.first.z < 0.f) {
@@ -142,7 +142,7 @@ auto AimBot::render() -> void {
         bool still_valid = false;
         if (lock.ptr && lock.id) {
             for (const auto& a : temp) {
-                if (a.real_ptr == lock.ptr && !a.dead && !a.local && a.team != local_role.load()->team) {
+                if (a.real_ptr == lock.ptr && !a.hide && !a.dead && !a.local && a.team != local_role.load()->team) {
                     still_valid = true;
                     break;
                 }
@@ -304,12 +304,12 @@ auto AimBot::update() -> void {
             }
 
             const auto trans_neck = animator->GetBoneTransform(II::Animator::HumanBodyBones::Neck);
-            if (util::is_bad_ptr(trans)) {
+            if (util::is_bad_ptr(trans_neck)) {
                 continue;
             }
 
             const auto trans_hip = animator->GetBoneTransform(II::Animator::HumanBodyBones::Hips);
-            if (util::is_bad_ptr(trans)) {
+            if (util::is_bad_ptr(trans_hip)) {
                 continue;
             }
 
@@ -325,8 +325,7 @@ auto AimBot::update() -> void {
             _i.dead = weak == 0 && hp == 0;
             _i.pos_neck = trans_neck->GetPosition();
             _i.pos_hip = trans_hip->GetPosition();
-            glm::vec3 pos_head = trans->GetPosition();
-            _i.pos_head = glm::mix(_i.pos_neck, pos_head, 0.65);
+            _i.pos_head = glm::mix(_i.pos_neck, trans->GetPosition(), 0.7);
             _i.screen_pos.second = w2c->commit(_i.pos_head);
             _i.real_ptr = role;
         } catch (...) {}
@@ -379,6 +378,34 @@ auto AimBot::process_data() -> void {
     } catch (...) {
         roles.clear();
         return;
+    }
+
+    const auto local = local_role.load();
+    for (auto& role : roles_commit) {
+        if (role.local) {
+            continue;
+        }
+
+        role.hide = true;
+
+        try {
+            II::RaycastHit hit;
+            if (!II::Physics::linecast(local->pos_head, role.pos_head, hit)) {
+                continue;
+            }
+
+            const auto collider = II::UnityObject::find_object_from_instance_id<II::Collider*>(hit.m_Collider);
+            if (util::is_bad_ptr(collider)) {
+                continue;
+            }
+
+            const auto role_ptr = collider->get_component_in_parent<BattleRole*>(BattleRole::class_);
+            if (util::is_bad_ptr(role_ptr) || local->real_ptr == role_ptr || role_ptr != role.real_ptr) {
+                continue;
+            }
+
+            role.hide = false;
+        } catch (...) {}
     }
 
     std::lock_guard lock_s(mutex);
