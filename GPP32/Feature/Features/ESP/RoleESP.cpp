@@ -90,13 +90,13 @@ auto ESP::render() -> void {
 }
 
 auto ESP::update() -> void {
-    roles_commit.clear();
     if (util::is_bad_ptr(local_role.load())) {
         return;
     }
 
     const auto w2c = W2C::instance();
     process_data();
+    roles_commit.clear();
     roles_commit.resize(BattleRole::roles.size());
 
     int index = 0;
