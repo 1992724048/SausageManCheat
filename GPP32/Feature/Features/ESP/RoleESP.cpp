@@ -90,10 +90,6 @@ auto ESP::render() -> void {
 }
 
 auto ESP::update() -> void {
-    if (util::is_bad_ptr(local_role.load())) {
-        return;
-    }
-
     const auto w2c = W2C::instance();
     process_data();
     roles_commit.clear();
