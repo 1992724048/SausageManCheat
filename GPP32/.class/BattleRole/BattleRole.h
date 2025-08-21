@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include ".class/ClassRegistrar.h"
 #include ".class/BattleRoleLogic/BattleRoleLogic.h"
+#include ".class/HitPart/HitPart.h"
 #include ".class/RoleControl/RoleControl.h"
 #include ".class/WeaponControl/WeaponControl.h"
 
@@ -12,6 +13,7 @@ public:
     inline static IF::Variable<BattleRole, bool> is_clear;
     inline static IF::Variable<BattleRole, WeaponControl*> user_weapon;
     inline static IF::Variable<BattleRole, II::GameObject*> game_object;
+    inline static IF::Variable<BattleRole, HitPart*> hit_part;
 
     inline static IC* class_;
     inline static std::vector<BattleRole*, mi_stl_allocator<BattleRole*>> roles;
@@ -28,6 +30,8 @@ public:
         role_control.Init(class_->Get<IF>("MyRoleControl"));
         is_clear.Init(class_->Get<IF>("IsClear"));
         user_weapon.Init(class_->Get<IF>("UserWeapon"));
+        hit_part.Init(class_->Get<IF>("BulletDownHpAudio"));
+        hit_part.offset -= 0x18;
         game_object.Init(class_->Get<IF>("LockTarget"));
         game_object.offset -= sizeof(glm::vec3);
         game_object.offset -= sizeof(void*);

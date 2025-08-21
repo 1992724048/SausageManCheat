@@ -8,7 +8,7 @@
 ItemEsp::ItemEsp() {
 }
 
-auto ItemEsp::render() -> void {
+auto ItemEsp::render() -> void try {
     std::vector<Item, mi_stl_allocator<Item>> temp;
     {
         std::lock_guard lock_s(mutex);
@@ -40,9 +40,11 @@ auto ItemEsp::render() -> void {
         ImDrawList* bg = ImGui::GetBackgroundDrawList();
         draw_info(bg, pos, name, item_id, type, num);
     }
+} catch (...) {
+    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
-auto ItemEsp::update() -> void {
+auto ItemEsp::update() -> void try {
     process_data();
 
     int size = 0;
@@ -115,9 +117,11 @@ auto ItemEsp::update() -> void {
     for (const auto& vec : per_index_results) {
         items_commit.insert(items_commit.end(), std::make_move_iterator(vec.begin()), std::make_move_iterator(vec.end()));
     }
+} catch (...) {
+    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
-auto ItemEsp::process_data() -> void {
+auto ItemEsp::process_data() -> void try {
     if (items_commit.empty()) {
         return;
     }
@@ -134,6 +138,8 @@ auto ItemEsp::process_data() -> void {
 
     std::lock_guard lock(mutex);
     items = std::move(items_commit);
+} catch (...) {
+    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
 auto ItemEsp::draw_info(ImDrawList* _bg, const std::conditional_t<true, glm::vec3, int>& _screen_pos, util::String& _name, const int64_t _id, int64_t _type, const int _num) -> void {
@@ -146,7 +152,7 @@ auto ItemEsp::draw_info(ImDrawList* _bg, const std::conditional_t<true, glm::vec
         item = &info_list[_name];
     }
 
-    auto& [group, type, color] = *item;
+    auto& [group, type, color, show] = *item;
     color.Value.w = 0.4f;
 
     if (_num > 1) {

@@ -8,7 +8,7 @@
 
 AIESP::AIESP() {}
 
-auto AIESP::render() -> void {
+auto AIESP::render() -> void try {
     std::vector<AI, mi_stl_allocator<AI>> temp;
     {
         std::lock_guard lock_s(mutex);
@@ -40,9 +40,11 @@ auto AIESP::render() -> void {
         ImDrawList* bg = ImGui::GetBackgroundDrawList();
         draw_info(bg, screen_pos, hp, weak, name);
     }
+} catch (...) {
+    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
-auto AIESP::update() -> void {
+auto AIESP::update() -> void try {
     process_data();
 
     int size = 0;
@@ -91,9 +93,11 @@ auto AIESP::update() -> void {
             ai_.name = std::move(RoleAILogic::name[ai]->ToString());
         } catch (...) {}
     }
+} catch (...) {
+    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
-auto AIESP::process_data() -> void {
+auto AIESP::process_data() -> void try {
     if (ais_commit.empty()) {
         return;
     }
@@ -105,6 +109,8 @@ auto AIESP::process_data() -> void {
 
     std::lock_guard lock(mutex);
     ais = std::move(ais_commit);
+} catch (...) {
+    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
 auto AIESP::draw_info(ImDrawList* _bg, std::pair<glm::vec3, int> _screen_pos_, float& _hp, float& _weak, const util::String& _name) -> void {
@@ -144,3 +150,14 @@ auto AIESP::draw_info(ImDrawList* _bg, std::pair<glm::vec3, int> _screen_pos_, f
     _bg->AddText({max_.x + 5, name_text_y}, ImColor(255, 255, 255), _name.data());
     _bg->AddText(team_text_pos, ImColor(255, 255, 255), team.data());
 }
+
+/*auto client = RoleAILogic::client_logic[ai];
+auto hits = ClientRoleAILogic::role_ai_hits[client];
+if (!util::is_bad_ptr(CameraController::local_role)) {
+    auto hit_part = BattleRole::hit_part[CameraController::local_role];
+    if (!util::is_bad_ptr(hit_part)) {
+        for (auto& hit : hits->ToArray()->ToVector()) {
+            hit_part->api_hit_role_ai(hit);
+        }
+    }
+}*/

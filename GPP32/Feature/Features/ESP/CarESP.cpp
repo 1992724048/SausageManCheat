@@ -9,7 +9,7 @@
 
 CarEsp::CarEsp() {}
 
-auto CarEsp::render() -> void {
+auto CarEsp::render() -> void try {
     std::vector<Car, mi_stl_allocator<Car>> temp;
     {
         std::lock_guard lock_s(mutex);
@@ -41,9 +41,11 @@ auto CarEsp::render() -> void {
         ImDrawList* bg = ImGui::GetBackgroundDrawList();
         draw_info(bg, pos, _id, hp, hp_max, oil, oil_max);
     }
+} catch (...) {
+    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
-auto CarEsp::update() -> void {
+auto CarEsp::update() -> void try {
     process_data();
 
     int size = 0;
@@ -106,9 +108,11 @@ auto CarEsp::update() -> void {
             car_.name = std::move(::Car::car_data_id[car]->ToString());
         } catch (...) {}
     }
+} catch (...) {
+    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
-auto CarEsp::process_data() -> void {
+auto CarEsp::process_data() -> void try {
     if (cars_commit.empty()) {
         return;
     }
@@ -120,6 +124,8 @@ auto CarEsp::process_data() -> void {
 
     std::lock_guard lock(mutex);
     cars = std::move(cars_commit);
+} catch (...) {
+    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
 auto CarEsp::draw_info(ImDrawList* _bg,

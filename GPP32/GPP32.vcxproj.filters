@@ -1713,7 +1713,13 @@
     <ClInclude Include="Feature\Features\AppInfo\Performance.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include=".class\Main\Main.h">
+    <ClInclude Include=".class\RoleAIHit\RoleAIHit.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include=".class\ClientRoleAILogic\ClientRoleAILogic.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include=".class\HitPart\HitPart.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1910,7 +1916,13 @@
     <ClCompile Include="Feature\Features\AppInfo\Performance.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include=".class\Main\Main.cpp">
+    <ClCompile Include=".class\RoleAIHit\RoleAIHit.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include=".class\ClientRoleAILogic\ClientRoleAILogic.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include=".class\HitPart\HitPart.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

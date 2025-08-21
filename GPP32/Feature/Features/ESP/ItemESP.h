@@ -29,6 +29,7 @@ public:
         util::String group;
         util::String type;
         ImColor color;
+        bool show = true;
     };
 
     inline static util::Map<int64_t, ItemInfo*> info_list_id{};

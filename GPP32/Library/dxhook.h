@@ -16,6 +16,7 @@ public:
     }
 
     inline static glm::vec2 size;
+    inline static HWND hwnd;
 private:
     inline static IDXGISwapChainPresent present;
     inline static ID3D11Device* p_device = nullptr;
@@ -23,7 +24,6 @@ private:
     inline static IDXGISwapChain* p_swap_chain = nullptr;
     inline static ID3D11RenderTargetView* main_render_target_view;
     inline static WNDPROC original_wndproc_handler;
-    inline static HWND hwnd;
 
     static auto find_direct11_present() -> IDXGISwapChainPresent {
         WNDCLASSEX wc{};
@@ -147,7 +147,7 @@ private:
 #endif
         switch (uMsg) {
             case WM_CLOSE:
-                MessageBoxW(nullptr, L"请从启动器关闭!", L"提示", 0);
+                MessageBoxW(nullptr, L"请从启动器关闭!", L"提示", MB_ICONINFORMATION);
                 return 0;
             default:
                 break;

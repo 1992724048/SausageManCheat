@@ -42,21 +42,7 @@ public:
             const auto aim = AimBot::instance();
             if (const auto target = aim->lock_role.load()) {
                 const float dist = glm::distance(_fire_pos, target->pos_head);
-
                 float flight_time = dist / speed;
-                float dt = 1.0f / ImGui::GetIO().Framerate;
-                glm::vec3 target_velocity = target->move_dir / dt;
-
-                for (int i = 0; i < 2; ++i) {
-                    glm::vec3 predicted_pos = target->pos_head + target_velocity * flight_time;
-
-                    if (gravity != 0.f) {
-                        predicted_pos.y += 0.5f * gravity * flight_time * flight_time;
-                    }
-
-                    float new_dist = glm::distance(_fire_pos, predicted_pos);
-                    flight_time = new_dist / speed;
-                }
 
                 static std::random_device rd;
                 static std::mt19937 gen(rd());
@@ -83,12 +69,11 @@ public:
                     }
                 }
 
-                glm::vec3 final_pos = aim_point + target_velocity * flight_time;
                 if (gravity != 0.f) {
-                    final_pos.y += 0.5f * gravity * flight_time * flight_time;
+                    aim_point.y += 0.5f * gravity * flight_time * flight_time;
                 }
 
-                glm::vec3 dir = glm::normalize(final_pos - _fire_pos);
+                glm::vec3 dir = glm::normalize(aim_point - _fire_pos);
                 _rot = glm::quatLookAtLH(dir, glm::vec3(0, 1, 0));
             }
         }

@@ -58,7 +58,7 @@ auto calc_quat(const glm::vec2 _euler) -> std::pair<glm::quat, glm::quat> {
     return {{quaternion_x.w, 0, quaternion_x.x, 0}, {quaternion_y.w, quaternion_y.y, 0, 0}};
 }
 
-auto AimBot::render() -> void {
+auto AimBot::render() -> void try {
     struct lock_ctx {
         BattleRole* ptr = nullptr;
         int64_t id = 0;
@@ -261,9 +261,11 @@ auto AimBot::render() -> void {
             y_q = new_yq;
         } catch (...) {}
     }
+} catch (...) {
+    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
-auto AimBot::update() -> void {
+auto AimBot::update() -> void try {
     const auto w2c = W2C::instance();
     process_data();
     roles_commit.clear();
@@ -330,9 +332,11 @@ auto AimBot::update() -> void {
             _i.real_ptr = role;
         } catch (...) {}
     }
+} catch (...) {
+    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
-auto AimBot::process_data() -> void {
+auto AimBot::process_data() -> void try {
     if (roles_commit.empty()) {
         return;
     }
@@ -410,4 +414,6 @@ auto AimBot::process_data() -> void {
 
     std::lock_guard lock_s(mutex);
     roles = std::move(roles_commit);
+} catch (...) {
+    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }

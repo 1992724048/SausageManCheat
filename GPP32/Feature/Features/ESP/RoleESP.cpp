@@ -21,7 +21,7 @@
 
 ESP::ESP() {}
 
-auto ESP::render() -> void {
+auto ESP::render() -> void try {
     std::vector<Role, mi_stl_allocator<Role>> temp;
     {
         std::lock_guard lock_s(mutex);
@@ -83,9 +83,11 @@ auto ESP::render() -> void {
             }
         }
     }
+} catch (...) {
+    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
-auto ESP::update() -> void {
+auto ESP::update() -> void try {
     const auto w2c = W2C::instance();
     process_data();
     roles_commit.clear();
@@ -169,9 +171,11 @@ auto ESP::update() -> void {
                               process_box(_i.scale, _i.pos, _i.screen_pos_top, _i.rect_pos_upper, _i.rect_pos_lower, _i.y_rot);
                           }
                       });
+} catch (...) {
+    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
-auto ESP::process_data() -> void {
+auto ESP::process_data() -> void try {
     if (roles_commit.empty()) {
         return;
     }
@@ -236,6 +240,8 @@ auto ESP::process_data() -> void {
 
     std::lock_guard lock_s(mutex);
     roles = std::move(roles_commit);
+} catch (...) {
+    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
 auto ESP::process_box(const glm::vec3& _scale_,
