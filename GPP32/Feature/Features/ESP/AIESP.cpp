@@ -6,7 +6,7 @@
 
 #include "memory/ESP/ESPConfig.h"
 
-AIESP::AIESP() {}
+AIESP::AIESP() = default;
 
 auto AIESP::render() -> void try {
     std::vector<AI, mi_stl_allocator<AI>> temp;
@@ -41,7 +41,7 @@ auto AIESP::render() -> void try {
         draw_info(bg, screen_pos, hp, weak, name);
     }
 } catch (...) {
-    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
+    MessageBoxA(nullptr, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
 auto AIESP::update() -> void try {
@@ -94,7 +94,7 @@ auto AIESP::update() -> void try {
         } catch (...) {}
     }
 } catch (...) {
-    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
+    MessageBoxA(nullptr, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
 auto AIESP::process_data() -> void try {
@@ -110,7 +110,7 @@ auto AIESP::process_data() -> void try {
     std::lock_guard lock(mutex);
     ais = std::move(ais_commit);
 } catch (...) {
-    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
+    MessageBoxA(nullptr, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
 auto AIESP::draw_info(ImDrawList* _bg, std::pair<glm::vec3, int> _screen_pos_, float& _hp, float& _weak, const util::String& _name) -> void {

@@ -19,6 +19,10 @@ public:
     inline static I::MethodPointer<BattleRole*, BattleRoleLogic*> get_role;
     inline static IC* class_;
 
+    auto api_get_role() -> BattleRole* {
+        return get_role(this);
+    }
+
     BattleRoleLogic();
     ~BattleRoleLogic();
 
@@ -36,6 +40,10 @@ public:
         client.offset -= sizeof(void*);
         get_weapons.Init(class_->Get<IF>("GetWeapons"));
 
-        class_->Get<IM>("$PB")->Cast(get_role);
+        for (auto& method : class_->methods) {
+            if (I::name_map[method.return_type->name] == "BattleRole") {
+                method.Cast(get_role);
+            }
+        }
     }
 };

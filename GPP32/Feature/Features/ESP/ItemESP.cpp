@@ -5,8 +5,7 @@
 #include ".class/CameraController/CameraController.h"
 #include "memory/ESP/ESPConfig.h"
 
-ItemEsp::ItemEsp() {
-}
+ItemEsp::ItemEsp() = default;
 
 auto ItemEsp::render() -> void try {
     std::vector<Item, mi_stl_allocator<Item>> temp;
@@ -41,7 +40,7 @@ auto ItemEsp::render() -> void try {
         draw_info(bg, pos, name, item_id, type, num);
     }
 } catch (...) {
-    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
+    MessageBoxA(nullptr, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
 auto ItemEsp::update() -> void try {
@@ -87,22 +86,22 @@ auto ItemEsp::update() -> void try {
                                   return;
                               }
 
-                              const auto pickitems = std::move(item_list->ToArray()->ToVector());
-                              per_index_results[_i].resize(pickitems.size());
-                              for (int j = 0; j < pickitems.size(); j++) {
+                              const auto pickitems = item_list->ToArray();
+                              per_index_results[_i].resize(item_list->size);
+                              for (int j = 0; j < item_list->size; j++) {
                                   auto& [name, screen_pos, id, type, num] = per_index_results[_i][j];
-                                  const auto address = pickitems[j];
+                                  const auto address = pickitems->At(j);
                                   if (util::is_bad_ptr(address)) {
                                       continue;
                                   }
 
+                                  auto pos = PickItem::pos[address];
                                   const auto item_net = PickItem::my_pick_item_net[address];
                                   const auto item_config = PickItem::pick_item_data_config[address];
                                   if (util::is_bad_ptr(item_net) || util::is_bad_ptr(item_config)) {
                                       continue;
                                   }
 
-                                  auto pos = PickItem::pos[address];
                                   screen_pos.first = pos;
                                   screen_pos.second = w2c->commit(pos);
 
@@ -118,7 +117,7 @@ auto ItemEsp::update() -> void try {
         items_commit.insert(items_commit.end(), std::make_move_iterator(vec.begin()), std::make_move_iterator(vec.end()));
     }
 } catch (...) {
-    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
+    MessageBoxA(nullptr, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
 auto ItemEsp::process_data() -> void try {
@@ -139,7 +138,7 @@ auto ItemEsp::process_data() -> void try {
     std::lock_guard lock(mutex);
     items = std::move(items_commit);
 } catch (...) {
-    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
+    MessageBoxA(nullptr, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
 auto ItemEsp::draw_info(ImDrawList* _bg, const std::conditional_t<true, glm::vec3, int>& _screen_pos, util::String& _name, const int64_t _id, int64_t _type, const int _num) -> void {

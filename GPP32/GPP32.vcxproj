@@ -155,6 +155,7 @@ tbbmalloc_proxy_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     <ClInclude Include=".class\BulletControl\BulletControl.h" />
     <ClInclude Include=".class\ClientRoleAILogic\ClientRoleAILogic.h" />
     <ClInclude Include=".class\HitPart\HitPart.h" />
+    <ClInclude Include=".class\Main\Main.h" />
     <ClInclude Include=".class\RoleAIHit\RoleAIHit.h" />
     <ClInclude Include=".class\RoleAILogic\RoleAILogic.h" />
     <ClInclude Include=".class\RoleAIManager\RoleAIManager.h" />
@@ -726,6 +727,7 @@ tbbmalloc_proxy_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     <ClCompile Include=".class\BulletControl\BulletControl.cpp" />
     <ClCompile Include=".class\ClientRoleAILogic\ClientRoleAILogic.cpp" />
     <ClCompile Include=".class\HitPart\HitPart.cpp" />
+    <ClCompile Include=".class\Main\Main.cpp" />
     <ClCompile Include=".class\RoleAIHit\RoleAIHit.cpp" />
     <ClCompile Include=".class\RoleAILogic\RoleAILogic.cpp" />
     <ClCompile Include=".class\RoleAIManager\RoleAIManager.cpp" />

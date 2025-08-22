@@ -114,10 +114,10 @@ private:
 
                 original_wndproc_handler = reinterpret_cast<WNDPROC>(SetWindowLongPtr(sd.OutputWindow, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(wndproc)));
 
-                WINDOWINFO windowInfo = {sizeof(WINDOWINFO)};
-                GetWindowInfo(sd.OutputWindow, &windowInfo);
-                auto window_width = windowInfo.rcClient.right - windowInfo.rcClient.left;
-                auto window_height = windowInfo.rcClient.bottom - windowInfo.rcClient.top;
+                WINDOWINFO window_info = {sizeof(WINDOWINFO)};
+                GetWindowInfo(sd.OutputWindow, &window_info);
+                auto window_width = window_info.rcClient.right - window_info.rcClient.left;
+                auto window_height = window_info.rcClient.bottom - window_info.rcClient.top;
                 size = {window_width, window_height};
                 hwnd = sd.OutputWindow;
 

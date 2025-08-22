@@ -19,7 +19,7 @@
 #include "memory/ESP/ESPConfig.h"
 #include "memory/W2C/W2C.h"
 
-ESP::ESP() {}
+ESP::ESP() = default;
 
 auto ESP::render() -> void try {
     std::vector<Role, mi_stl_allocator<Role>> temp;
@@ -84,7 +84,7 @@ auto ESP::render() -> void try {
         }
     }
 } catch (...) {
-    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
+    MessageBoxA(nullptr, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
 auto ESP::update() -> void try {
@@ -172,7 +172,7 @@ auto ESP::update() -> void try {
                           }
                       });
 } catch (...) {
-    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
+    MessageBoxA(nullptr, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
 auto ESP::process_data() -> void try {
@@ -241,7 +241,7 @@ auto ESP::process_data() -> void try {
     std::lock_guard lock_s(mutex);
     roles = std::move(roles_commit);
 } catch (...) {
-    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
+    MessageBoxA(nullptr, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
 auto ESP::process_box(const glm::vec3& _scale_,

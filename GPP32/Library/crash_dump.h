@@ -69,6 +69,7 @@ public:
 
 class Crash {
 	inline static std::filesystem::path path_;
+	inline static std::mutex mutex;
 public:
 	static auto init(const std::filesystem::path& path) -> void {
 		SetErrorMode(SEM_NOGPFAULTERRORBOX | SEM_FAILCRITICALERRORS | SEM_NOALIGNMENTFAULTEXCEPT);
@@ -81,6 +82,8 @@ public:
 
 private:
 	static auto WINAPI unhandled_exception_filter_(const PEXCEPTION_POINTERS p_exception_info) -> LONG {
+		std::lock_guard lock(mutex);
+
 		std::stringstream msg;
 		const std::string dump_path = (path_ / "dump.dmp").string();
 
@@ -117,18 +120,16 @@ private:
 
 		const ExceptionTranslator error_info(p_exception_info->ExceptionRecord->ExceptionCode, p_exception_info);
 
-		msg << Encode::utf8_to_gbk("线程ID: ") << GetCurrentThreadId() << "\n";
-		msg << Encode::utf8_to_gbk("错误码: ") << std::hex << p_exception_info->ExceptionRecord->ExceptionCode << "\n";
-		msg << Encode::utf8_to_gbk("方法名: ") << p_symbol->Name << "\n";
-		msg << Encode::utf8_to_gbk("错误类型: ") << error_info.what();
+		msg << "线程ID: " << GetCurrentThreadId() << "\n";
+		msg << "错误码: " << std::hex << p_exception_info->ExceptionRecord->ExceptionCode << "\n";
+		msg << "方法名: " << p_symbol->Name << "\n";
+		msg << "错误类型: " << error_info.what();
 		msg << "\n------------------------\n";
 		msg << std::hex << p_exception_info->ContextRecord->Eip << ":\n";
 		msg << dump_registers(p_exception_info->ContextRecord) << "\n\n";
 
 
-		MessageBoxA(nullptr, msg.str().data(), Encode::utf8_to_gbk("错误").data(), MB_OK | MB_ICONERROR);
-
-		exit(p_exception_info->ExceptionRecord->ExceptionCode);
+		MessageBoxA(nullptr, msg.str().data(), "错误", MB_OK | MB_ICONERROR);
 		return EXCEPTION_CONTINUE_SEARCH;
 	}
 

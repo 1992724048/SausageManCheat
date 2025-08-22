@@ -7,7 +7,7 @@
 #include "memory/ESP/ESPConfig.h"
 #include "memory/W2C/W2C.h"
 
-CarEsp::CarEsp() {}
+CarEsp::CarEsp() = default;
 
 auto CarEsp::render() -> void try {
     std::vector<Car, mi_stl_allocator<Car>> temp;
@@ -42,7 +42,7 @@ auto CarEsp::render() -> void try {
         draw_info(bg, pos, _id, hp, hp_max, oil, oil_max);
     }
 } catch (...) {
-    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
+    MessageBoxA(nullptr, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
 auto CarEsp::update() -> void try {
@@ -109,7 +109,7 @@ auto CarEsp::update() -> void try {
         } catch (...) {}
     }
 } catch (...) {
-    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
+    MessageBoxA(nullptr, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
 auto CarEsp::process_data() -> void try {
@@ -125,7 +125,7 @@ auto CarEsp::process_data() -> void try {
     std::lock_guard lock(mutex);
     cars = std::move(cars_commit);
 } catch (...) {
-    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
+    MessageBoxA(nullptr, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
 auto CarEsp::draw_info(ImDrawList* _bg,

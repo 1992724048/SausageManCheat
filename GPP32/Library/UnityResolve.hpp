@@ -2551,36 +2551,14 @@ public:
                 return {};
             }
 
-            auto CameraToWorldMatrix() -> Matrix4x4 {
-                static Method* method;
-                if (!method) {
-                    method = Get("UnityEngine.CoreModule.dll")->Get("Camera")->Get<Method>(mode_ == Mode::Mono ? "get_cameraToWorldMatrix_Injected" : "get_cameraToWorldMatrix");
-                }
-                if (mode_ == Mode::Mono && method) {
-                    Matrix4x4 matrix4{};
-                    method->Invoke<void>(this, &matrix4);
-                    return matrix4;
-                }
-                if (method) {
-                    return method->Invoke<Matrix4x4>(this);
-                }
-                return {};
+            auto camera_to_world_matrix() -> Matrix4x4 {
+                static Method* method = Get("UnityEngine.CoreModule.dll")->Get("Camera")->Get<Method>(mode_ == Mode::Mono ? "get_cameraToWorldMatrix_Injected" : "get_cameraToWorldMatrix");
+                return method->Invoke<Matrix4x4>(this);
             }
 
-            auto GetProjectionMatrix() -> Matrix4x4 {
-                static Method* method;
-                if (!method) {
-                    method = Get("UnityEngine.CoreModule.dll")->Get("Camera")->Get<Method>(mode_ == Mode::Mono ? "get_projectionMatrix_Injected" : "get_projectionMatrix");
-                }
-                if (mode_ == Mode::Mono && method) {
-                    Matrix4x4 matrix4{};
-                    method->Invoke<void>(this, &matrix4);
-                    return matrix4;
-                }
-                if (method) {
-                    return method->Invoke<Matrix4x4>(this);
-                }
-                return {};
+            auto get_projection_matrix() -> Matrix4x4 {
+                static Method* method = Get("UnityEngine.CoreModule.dll")->Get("Camera")->Get<Method>(mode_ == Mode::Mono ? "get_projectionMatrix_Injected" : "get_projectionMatrix");
+                return method->Invoke<Matrix4x4>(this);
             }
 
             auto ScreenPointToRay(const Vector2& position, const Eye eye = Eye::Mono) -> Ray {

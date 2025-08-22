@@ -1722,6 +1722,9 @@
     <ClInclude Include=".class\HitPart\HitPart.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include=".class\Main\Main.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -1923,6 +1926,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include=".class\HitPart\HitPart.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include=".class\Main\Main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

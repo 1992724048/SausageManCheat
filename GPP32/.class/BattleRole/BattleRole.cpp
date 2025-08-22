@@ -16,15 +16,16 @@ auto BattleRole::get_all() -> void {
             return;
         }
 
-        roles.reserve(role_list->size);
-        const auto role_vec = std::move(role_list->ToArray()->ToVector());
-        for (const auto& role_lg : role_vec) {
+        roles.resize(role_list->size);
+        const auto role_vec = role_list->ToArray();
+        for (unsigned i = 0; i < role_list->size; i++) {
             try {
+                const auto role_lg = role_vec->At(i);
                 if (util::is_bad_ptr(role_lg)) {
                     continue;
                 }
 
-                auto role = BattleRoleLogic::get_role(role_lg);
+                auto role = role_lg->api_get_role();
                 if (util::is_bad_ptr(role)) {
                     continue;
                 }
@@ -33,7 +34,7 @@ auto BattleRole::get_all() -> void {
                     continue;
                 }
 
-                roles.push_back(role);
+                roles[i] = role;
             } catch (...) {}
         }
     } catch (...) {}

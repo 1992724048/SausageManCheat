@@ -16,7 +16,7 @@
 #include "memory/W2C/W2C.h"
 #include "Feature/Features/ESP/RoleESP.h"
 
-AimBot::AimBot() {}
+AimBot::AimBot() = default;
 
 struct HotKey {
     bool is_mouse;
@@ -262,7 +262,7 @@ auto AimBot::render() -> void try {
         } catch (...) {}
     }
 } catch (...) {
-    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
+    MessageBoxA(nullptr, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
 auto AimBot::update() -> void try {
@@ -333,7 +333,7 @@ auto AimBot::update() -> void try {
         } catch (...) {}
     }
 } catch (...) {
-    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
+    MessageBoxA(nullptr, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }
 
 auto AimBot::process_data() -> void try {
@@ -415,5 +415,5 @@ auto AimBot::process_data() -> void try {
     std::lock_guard lock_s(mutex);
     roles = std::move(roles_commit);
 } catch (...) {
-    MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
+    MessageBoxA(nullptr, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
 }

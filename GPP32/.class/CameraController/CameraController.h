@@ -37,82 +37,9 @@ public:
     CameraController();
     ~CameraController();
 
-    static auto update_hook(CameraController* _i) -> void try {
+    static auto update_hook(CameraController* _i) -> void {
         HardBreakPoint::call_origin(update_hook, _i);
         camera_controller = _i;
-
-        tg_.update_start();
-        const auto w2c = W2C::instance();
-        w2c->wait();
-        w2c->clear();
-
-        BattleRole::roles.clear();
-
-        try {
-            if (util::is_bad_ptr(camera_controller)) {
-                return;
-            }
-
-            const auto trans = camera_tran[camera_controller];
-            if (util::is_bad_ptr(trans)) {
-                return;
-            }
-
-            camera_pos = trans->GetPosition();
-
-            const auto camera_ptr = camera[camera_controller];
-            if (util::is_bad_ptr(camera_ptr)) {
-                camera_controller = nullptr;
-                return;
-            }
-
-            const auto view = glm::inverse(camera_ptr->CameraToWorldMatrix());
-            w2c->camera_matrix = camera_ptr->GetProjectionMatrix() * view;
-            w2c->screen_size = DXHook::size;
-
-            local_role = lock_role[camera_controller];
-            if (util::is_bad_ptr(local_role)) {
-                camera_controller = nullptr;
-                return;
-            }
-
-            local_role_logic = BattleRole::role_logic[local_role];
-            if (util::is_bad_ptr(local_role_logic)) {
-                camera_controller = nullptr;
-                return;
-            }
-
-            local_role_statistics = BattleRoleLogic::statistics_data[local_role_logic];
-            if (util::is_bad_ptr(local_role_statistics)) {
-                camera_controller = nullptr;
-                return;
-            }
-
-            battle_world = StatisticsData::game_world[local_role_statistics];
-            if (util::is_bad_ptr(battle_world)) {
-                camera_controller = nullptr;
-                return;
-            }
-
-            start_game = BattleWorld::start_game[battle_world];
-            BattleRole::get_all();
-        } catch (...) {
-            camera_controller = nullptr;
-            return;
-        }
-
-        if (BattleRole::roles.empty()) {
-            camera_controller = nullptr;
-            return;
-        }
-
-        FeatureBase::instance().update();
-        w2c->start();
-        std::unique_lock lock(rw_lock);
-        update_time = tg_.get_duration<std::chrono::milliseconds>();
-    } catch (...) {
-        HardBreakPoint::call_origin(update_hook, _i);
-        MessageBoxA(DXHook::hwnd, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
     }
 
     auto init() -> void override {

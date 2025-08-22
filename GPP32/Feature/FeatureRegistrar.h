@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include <pch.h>
 
+#include "dxhook.h"
+
 #include "library/thread_pool.hpp"
 
 class FeatureBase {
@@ -26,10 +28,11 @@ public:
     virtual auto render() -> void {
         render_tg_all.update_start();
         for (const auto& val : fetures_ptr) {
-            //val->render_tg_.update_start();
-            val->render();
-            //std::unique_lock lock(rw_lock);
-            //val->render_time = val->render_tg_.get_duration<std::chrono::milliseconds>();
+            try {
+                val->render();
+            } catch (...) {
+                MessageBoxA(nullptr, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
+            }
         }
         std::unique_lock lock(rw_lock_all);
         render_time_all = render_tg_all.get_duration<std::chrono::milliseconds>();
@@ -38,10 +41,11 @@ public:
     virtual auto update() -> void {
         update_tg_all.update_start();
         for (const auto& val : fetures_ptr) {
-            //val->update_tg_.update_start();
-            val->update();
-            //std::unique_lock lock(rw_lock);
-            //val->update_time = val->update_tg_.get_duration<std::chrono::milliseconds>();
+            try {
+                val->update();
+            } catch (...) {
+                MessageBoxA(nullptr, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);
+            }
         }
         std::unique_lock lock(rw_lock_all);
         update_time_all = update_tg_all.get_duration<std::chrono::milliseconds>();
@@ -60,10 +64,6 @@ public:
     FeatureBase(FeatureBase&&) = delete;
     auto operator=(FeatureBase&&) -> FeatureBase & = delete;
 
-    //std::shared_mutex rw_lock;
-    //float update_time;
-    //float render_time;
-
     inline static std::shared_mutex rw_lock_all;
     inline static float update_time_all;
     inline static float render_time_all;
@@ -80,8 +80,6 @@ protected:
     inline static std::vector<std::function<void()>> creates;
 
 private:
-    tp::TimeGuard update_tg_;
-    tp::TimeGuard render_tg_;
     inline static tp::TimeGuard update_tg_all;
     inline static tp::TimeGuard render_tg_all;
     inline static std::once_flag once_flag;
