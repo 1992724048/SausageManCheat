@@ -45,12 +45,12 @@ namespace util {
     using String = std::basic_string<char, std::char_traits<char>, mi_stl_allocator<char>>;
 
     inline auto is_bad_ptr(void* _address, const int _size = 1) -> bool {
-        if (reinterpret_cast<std::uintptr_t>(_address) < 0xF000) {
+        if (reinterpret_cast<std::uintptr_t>(_address) < 0xFFFF) {
             return true;
         }
 
         try {
-            *static_cast<char*>(_address) = *static_cast<char*>(_address);
+            [[maybe_unused]] char chr = *static_cast<char*>(_address);
         } catch (...) {
             return true;
         }

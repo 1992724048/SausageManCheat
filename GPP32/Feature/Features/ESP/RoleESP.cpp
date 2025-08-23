@@ -63,6 +63,10 @@ auto ESP::render() -> void try {
             continue;
         }
 
+        if (role.name.empty() || role.team == 0) {
+            continue;
+        }
+
         ImDrawList* bg = ImGui::GetBackgroundDrawList();
         if (esp->show_role) {
             if (esp->show_info) {
