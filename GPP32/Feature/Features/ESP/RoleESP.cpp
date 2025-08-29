@@ -45,47 +45,49 @@ auto ESP::render() -> void try {
     }
 
     const auto local = local_role.load();
-    if (!local) {
+    if (util::is_bad_ptr(local)) {
         return;
     }
 
     for (auto& role : temp) {
-        auto& [screen_pos, pos] = role.screen_pos;
-        if (screen_pos.z < 0.f) {
-            continue;
-        }
-
-        if (role.local || role.dead) {
-            continue;
-        }
-
-        if (!esp->show_team && local->team == role.team) {
-            continue;
-        }
-
-        if (role.name.empty() || role.team == 0) {
-            continue;
-        }
-
-        ImDrawList* bg = ImGui::GetBackgroundDrawList();
-        if (esp->show_role) {
-            if (esp->show_info) {
-                screen_pos.y += 15;
-                draw_info(bg, screen_pos, role.name, role.team, role.weak, role.hp, role.falling);
+        try {
+            auto& [screen_pos, pos] = role.screen_pos;
+            if (screen_pos.z < 0.f) {
+                continue;
             }
 
-            if (esp->show_bone && !role.falling) {
-                auto& [top, _id] = role.screen_pos_top;
-                auto& [neck, _id2] = role.screen_pos_neck;
-                auto& [head, _id3] = role.screen_pos_head;
-                bg->AddCircle({ head.x, head.y }, glm::distance(neck, top) / 2.2f, role.hide ? ImColor(255, 25, 25) : ImColor(25, 255, 25));
-                draw_bone(bg, role.bones);
+            if (role.local || role.dead) {
+                continue;
             }
 
-            if (esp->show_box && !role.falling) {
-                draw_box(bg, role.rect_pos_upper, role.rect_pos_lower);
+            if (!esp->show_team && local->team == role.team) {
+                continue;
             }
-        }
+
+            if (role.name.empty() || role.team == 0) {
+                continue;
+            }
+
+            ImDrawList* bg = ImGui::GetBackgroundDrawList();
+            if (esp->show_role) {
+                if (esp->show_info) {
+                    screen_pos.y += 15;
+                    draw_info(bg, screen_pos, role.name, role.team, role.weak, role.hp, role.falling);
+                }
+
+                if (esp->show_bone && !role.falling) {
+                    auto& [top, _id] = role.screen_pos_top;
+                    auto& [neck, _id2] = role.screen_pos_neck;
+                    auto& [head, _id3] = role.screen_pos_head;
+                    bg->AddCircle({ head.x, head.y }, glm::distance(neck, top) / 2.2f, role.hide ? ImColor(255, 25, 25) : ImColor(25, 255, 25));
+                    draw_bone(bg, role.bones);
+                }
+
+                if (esp->show_box && !role.falling) {
+                    draw_box(bg, role.rect_pos_upper, role.rect_pos_lower);
+                }
+            }
+        } catch (...) {}
     }
 } catch (...) {
     MessageBoxA(nullptr, "未经处理的异常!\n" __FUNCTION__, "致命错误!", MB_ICONERROR);

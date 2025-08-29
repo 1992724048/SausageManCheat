@@ -101,8 +101,8 @@
       </FloatingPointExceptions>
       <GuardEHContMetadata>
       </GuardEHContMetadata>
-      <GenerateAlternateCodePaths>AVX2</GenerateAlternateCodePaths>
-      <UseProcessorExtensions>AVX2</UseProcessorExtensions>
+      <GenerateAlternateCodePaths>ARROWLAKE-S</GenerateAlternateCodePaths>
+      <UseProcessorExtensions>ARROWLAKE-S</UseProcessorExtensions>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <OpenMP>GenerateParallelCode</OpenMP>
       <OpenMPOffloading>None</OpenMPOffloading>
