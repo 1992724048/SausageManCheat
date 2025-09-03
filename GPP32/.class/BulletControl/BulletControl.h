@@ -33,7 +33,7 @@ public:
         float gravity = 0.f;
 
         try {
-            const auto sg = speed_gravity[_bc]->ToVector()[0];
+            const auto sg = speed_gravity[_bc]->to_vector()[0];
             speed = BulletSpeedAndGravity::bullet_speed[sg];
             gravity = BulletSpeedAndGravity::gravity[sg];
         } catch (...) {}

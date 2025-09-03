@@ -17733,6 +17733,7 @@
     <ClInclude Include="library\zlib\zutil.h" />
     <ClInclude Include="SYCL\SYCL.hpp" />
     <ClInclude Include="ToolsBox.h" />
+    <ClInclude Include="UnityResolve.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include=".plugin\bitsdojo_window_windows\bitsdojo_window.cpp" />

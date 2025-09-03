@@ -35,7 +35,7 @@ auto Memory::update() -> void {
         }
 
         if (cfg->bullet_no_gravity) {
-            const auto array = std::move(SOWeaponControl::bullet_speed_and_gravity[control]->ToVector());
+            const auto array = std::move(SOWeaponControl::bullet_speed_and_gravity[control]->to_vector());
             for (const auto& bullet_speed_and_gravity : array) {
                 BulletSpeedAndGravity::gravity[bullet_speed_and_gravity] = 0;
                 BulletSpeedAndGravity::fly_time[bullet_speed_and_gravity] = 80000;

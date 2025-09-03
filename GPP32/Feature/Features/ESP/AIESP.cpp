@@ -90,7 +90,7 @@ auto AIESP::update() -> void try {
             ai_.hp = RoleAILogic::hp[ai];
             ai_.weak = RoleAILogic::weak[ai];
 
-            ai_.name = std::move(RoleAILogic::name[ai]->ToString());
+            ai_.name = std::move(RoleAILogic::name[ai]->to_string());
         } catch (...) {}
     }
 } catch (...) {

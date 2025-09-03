@@ -374,7 +374,7 @@ auto AimBot::process_data() -> void try {
             return;
         }
 
-        const auto array = std::move(weapon_array->ToVector());
+        const auto array = std::move(weapon_array->to_vector());
         for (auto& value : array) {
             bullet_gravity = BulletSpeedAndGravity::gravity[value];
             bullet_speed = BulletSpeedAndGravity::bullet_speed[value];

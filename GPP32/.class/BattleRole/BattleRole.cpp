@@ -20,7 +20,7 @@ auto BattleRole::get_all() -> void {
         const auto role_vec = role_list->ToArray();
         for (unsigned i = 0; i < role_list->size; i++) {
             try {
-                const auto role_lg = role_vec->At(i);
+                const auto role_lg = role_vec->at(i);
                 if (util::is_bad_ptr(role_lg)) {
                     continue;
                 }

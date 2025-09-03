@@ -72,7 +72,7 @@ class _AboutPageState extends State<AboutPage>
           child: _GlassCard(
             child: _InfoCard(
               subtitle:
-                  '|界面版本: 1.0.0 |后端版本: 1.0.1 |安装器版本: 1.0.0 |辅助版本: 1.1.2 |SYCL 硬件加速后端: 1.0.0',
+                  '|界面版本: 1.0.0 |后端版本: 1.0.1 |安装器版本: 1.0.0 |辅助版本: 1.1.3 |SYCL 硬件加速后端: 1.0.0',
               content:
                   '高性能与颜值并存， 多种技术栈混合打造，免费且现代化游戏辅助\n\n'
                   '界面框架: Flutter， WPF\n'

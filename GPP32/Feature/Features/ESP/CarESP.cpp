@@ -105,7 +105,7 @@ auto CarEsp::update() -> void try {
             car_.hp_max = CarNetMirror::sync_max_hp[car_mirror];
             car_.oil = CarNetMirror::sync_oil_consumption[car_mirror];
             car_.oil_max = CarNetMirror::sync_max_oil_consumption[car_mirror];
-            car_.name = std::move(::Car::car_data_id[car]->ToString());
+            car_.name = std::move(::Car::car_data_id[car]->to_string());
         } catch (...) {}
     }
 } catch (...) {

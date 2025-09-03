@@ -90,7 +90,7 @@ auto ItemEsp::update() -> void try {
                               per_index_results[_i].resize(item_list->size);
                               for (int j = 0; j < item_list->size; j++) {
                                   auto& [name, screen_pos, id, type, num] = per_index_results[_i][j];
-                                  const auto address = pickitems->At(j);
+                                  const auto address = pickitems->at(j);
                                   if (util::is_bad_ptr(address)) {
                                       continue;
                                   }
@@ -108,7 +108,7 @@ auto ItemEsp::update() -> void try {
                                   id = PickItemDataConfig::item_id[item_config];
                                   type = PickItemDataConfig::item_type[item_config];
                                   num = PickItemNet::num[item_net];
-                                  name = std::move(PickItemDataConfig::item_name[item_config]->ToString());
+                                  name = std::move(PickItemDataConfig::item_name[item_config]->to_string());
                               }
                           } catch (...) {}
                       });

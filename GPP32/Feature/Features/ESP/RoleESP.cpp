@@ -163,7 +163,7 @@ auto ESP::update() -> void try {
                               Role& _i = roles_commit[i];
                               try {
                                   BattleRoleLogic* role_logic = BattleRole::role_logic[_i.role];
-                                  _i.name = std::move(BattleRoleLogic::name[role_logic]->ToString());
+                                  _i.name = std::move(BattleRoleLogic::name[role_logic]->to_string());
                                   _i.team = BattleRoleLogic::team[role_logic];
                                   _i.hp = BattleRoleLogic::hp[role_logic];
                                   _i.weak = BattleRoleLogic::weak[role_logic];

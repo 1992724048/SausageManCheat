@@ -15,7 +15,7 @@ auto APIENTRY DllMain(const HMODULE hModule, const DWORD ul_reason_for_call, LPV
             break;
         }
         case DLL_THREAD_ATTACH: {
-            I::ThreadAttach();
+            I::thread_attach();
             CONTEXT ctx = {0};
             GetThreadContext(GetCurrentThread(), &ctx);
             ctx.Dr7 = HardBreakPoint::dr7_.raw;

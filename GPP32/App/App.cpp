@@ -100,7 +100,7 @@ auto App::init_game_data() -> void {
     }
 
     game_handle = GetModuleHandle(L"GameAssembly.dll");
-    UnityResolve::Init(game_handle, UnityResolve::Mode::Il2Cpp);
+    UnityResolve::init(game_handle, UnityResolve::Mode::Il2Cpp);
 
 }
 
