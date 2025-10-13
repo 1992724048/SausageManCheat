@@ -2,5 +2,6 @@
     "cmake.ignoreCMakeListsMissing": true,
     "files.associations": {
         "variant": "cpp"
-    }
+    },
+    "dart.flutterSdkPath": "C:\\Flutter\\flutter"
 }

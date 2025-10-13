@@ -23,15 +23,15 @@ struct HotKey {
     int code;
 };
 
-auto decode(const int encoded) -> HotKey {
-    HotKey hk{};
-    hk.is_mouse = (encoded >> 31) & 1;
-    hk.code = encoded & 0xFF;
+auto decode(const int _encoded) -> HotKey {
+    HotKey hk;
+    hk.is_mouse = (_encoded >> 31) & 1;
+    hk.code = _encoded & 0xFF;
     return hk;
 }
 
-auto is_pressed(const int encoded) -> bool {
-    auto hk = decode(encoded);
+auto is_pressed(const int _encoded) -> bool {
+    const auto hk = decode(_encoded);
     if (hk.is_mouse) {
         return GetAsyncKeyState(VK_LBUTTON + (hk.code == 0x01 ? 0 : hk.code == 0x02 ? 1 : hk.code == 0x04 ? 2 : hk.code == 0x05 ? 3 : 4)) & 0x8000;
     }
@@ -404,7 +404,7 @@ auto AimBot::process_data() -> void try {
             }
 
             const auto role_ptr = collider->get_component_in_parent<BattleRole*>(BattleRole::class_);
-            if (util::is_bad_ptr(role_ptr) || local->real_ptr == role_ptr || role_ptr != role.real_ptr) {
+            if (util::is_bad_ptr(role_ptr) || local->real_ptr == role_ptr) {
                 continue;
             }
 

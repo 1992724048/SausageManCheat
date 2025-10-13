@@ -101,11 +101,11 @@ public:
     }
 
     auto init() -> void override {
-        class_ = I::Get("Assembly-CSharp.dll")->Get("$iA");
-        is_clear.Init(class_->Get<IF>("$b"));
+        class_ = I::Get("Assembly-CSharp.dll")->Get("$IA");
+        // is_clear.Init(class_->Get<IF>("$b"));
         speed_gravity.Init(class_->Get<IF>("$I"));
 
-        class_->Get<IM>("$sB")->Cast(hit_role);
+        // class_->Get<IM>("$sB")->Cast(hit_role);
         class_->Get<IM>("$Mb")->Cast(local_role_weapon_init);
         // HardBreakPoint::set_break_point(hit_role, hit_role_hook);
         HardBreakPoint::set_break_point(local_role_weapon_init, local_role_weapon_init_hook);

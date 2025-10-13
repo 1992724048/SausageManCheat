@@ -1267,7 +1267,7 @@ public:
                     throw std::runtime_error("Failed to convert wide string to UTF-8 multibyte");
                 }
 
-                std::string str(len, 0);
+                std::string str(len, '\n');
                 if (WideCharToMultiByte(CP_UTF8, 0, str_data, length, str.data(), len, nullptr, nullptr) == 0) {
                     throw std::runtime_error("Failed to convert wide string to UTF-8 multibyte");
                 }
@@ -1643,282 +1643,133 @@ public:
         };
 
         struct Camera : Component {
-            enum class Eye : int { Left, Right, Mono };
+            enum Eye : int { Left, Right, Mono };
 
-            static auto GetMain() -> Camera* {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("get_main");
-                }
-                if (method) {
-                    return method->invoke<Camera*>();
-                }
-                return nullptr;
+            static auto get_main() -> Camera* {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("get_main");
+                return method->invoke<Camera*>();
             }
 
-            static auto GetCurrent() -> Camera* {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("get_current");
-                }
-                if (method) {
-                    return method->invoke<Camera*>();
-                }
-                return nullptr;
+            static auto get_current() -> Camera* {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("get_current");
+                return method->invoke<Camera*>();
             }
 
-            static auto GetAllCount() -> int {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("get_allCamerasCount");
-                }
-                if (method) {
-                    return method->invoke<int>();
-                }
-                return 0;
+            static auto get_count() -> int {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("get_allCamerasCount");
+                return method->invoke<int>();
             }
 
-            static auto GetAllCamera() -> std::vector<Camera*> {
-                static Method* method;
-                static std::shared_ptr<Class> klass;
+            static auto get_cameras() -> std::vector<Camera*> {
+                static Method* method  = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("GetAllCameras", {"*"});
+                static std::shared_ptr<Class> klass = get("UnityEngine.CoreModule.dll")->get("Camera");
 
-                if (!method || !klass) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("GetAllCameras", {"*"});
-                    klass = get("UnityEngine.CoreModule.dll")->get("Camera");
-                }
-
-                if (method && klass) {
-                    if (const int count = GetAllCount(); count != 0) {
-                        const auto array = Array<Camera*>::create(klass.get(), count);
-                        method->invoke<int>(array);
-                        return array->to_vector();
-                    }
-                }
-
-                return {};
+                const auto array = Array<Camera*>::create(klass.get(), get_count());
+                return method->invoke<int>(array)->to_vector();
             }
 
-            auto GetDepth() -> float {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("get_depth");
-                }
-                if (method) {
-                    return method->invoke<float>(this);
-                }
-                return 0.0f;
+            auto get_depth() -> float {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("get_depth");
+                return method->invoke<float>(this);
             }
 
-            auto SetDepth(const float depth) -> void {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("set_depth", {"*"});
-                }
-                if (method) {
-                    return method->invoke<void>(this, depth);
-                }
+            auto set_depth(const float depth) -> void {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("set_depth", {"*"});
+                return method->invoke<void>(this, depth);
             }
 
-            auto SetFoV(const float fov) -> void {
-                static Method* method_fieldOfView;
-                if (!method_fieldOfView) {
-                    method_fieldOfView = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("set_fieldOfView", {"*"});
-                }
-                if (method_fieldOfView) {
-                    return method_fieldOfView->invoke<void>(this, fov);
-                }
+            auto set_fov(const float fov) -> void {
+                static Method* method_fieldOfView = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("set_fieldOfView", {"*"});
+                return method_fieldOfView->invoke<void>(this, fov);
             }
 
-            auto GetFoV() -> float {
-                static Method* method_fieldOfView;
-                if (!method_fieldOfView) {
-                    method_fieldOfView = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("get_fieldOfView");
-                }
-                if (method_fieldOfView) {
-                    return method_fieldOfView->invoke<float>(this);
-                }
-                return 0.0f;
+            auto get_fov() -> float {
+                static Method* method_fieldOfView = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("get_fieldOfView");
+                return method_fieldOfView->invoke<float>(this);
             }
 
-            auto WorldToScreenPoint(const Vector3& position, const Eye eye = Eye::Mono) -> Vector3 {
-                static Method* method;
-                if (!method) {
-                    if (mode_ == Mode::Mono) {
-                        method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("WorldToScreenPoint_Injected");
-                    } else {
-                        method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("WorldToScreenPoint", {"*", "*"});
-                    }
-                }
-                if (mode_ == Mode::Mono && method) {
-                    constexpr Vector3 vec3{};
-                    method->invoke<void>(this, position, eye, &vec3);
-                    return vec3;
-                }
-                if (method) {
-                    return method->invoke<Vector3>(this, position, eye);
-                }
-                return {};
+            auto world_to_screen_point(const Vector3& position, const Eye eye = Eye::Mono) -> Vector3 {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("WorldToScreenPoint_Injected");
+                Vector3 vec3{};
+                method->invoke<void>(this, position, eye, &vec3);
+                return vec3;
             }
 
-            auto ScreenToWorldPoint(const Vector3& position, const Eye eye = Eye::Mono) -> Vector3 {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>(mode_ == Mode::Mono ? "ScreenToWorldPoint_Injected" : "ScreenToWorldPoint");
-                }
-                if (mode_ == Mode::Mono && method) {
-                    constexpr Vector3 vec3{};
-                    method->invoke<void>(this, position, eye, &vec3);
-                    return vec3;
-                }
-                if (method) {
-                    return method->invoke<Vector3>(this, position, eye);
-                }
-                return {};
+            auto screen_to_world_point(const Vector3& position, const Eye eye = Eye::Mono) -> Vector3 {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("ScreenToWorldPoint_Injected");
+                Vector3 vec3{};
+                method->invoke<void>(this, position, eye, &vec3);
+                return vec3;
             }
 
-            auto CameraToWorldMatrix() -> Matrix4x4 {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>(mode_ == Mode::Mono ? "get_cameraToWorldMatrix_Injected" : "get_cameraToWorldMatrix");
-                }
-                if (mode_ == Mode::Mono && method) {
-                    Matrix4x4 matrix4{};
-                    method->invoke<void>(this, &matrix4);
-                    return matrix4;
-                }
-                if (method) {
-                    return method->invoke<Matrix4x4>(this);
-                }
-                return {};
+            auto camera_to_world_matrix() -> Matrix4x4 {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("get_cameraToWorldMatrix_Injected");
+                Matrix4x4 matrix4{};
+                method->invoke<void>(this, &matrix4);
+                return matrix4;
             }
 
-            auto ScreenPointToRay(const Vector2& position, const Eye eye = Eye::Mono) -> Ray {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>(mode_ == Mode::Mono ? "ScreenPointToRay_Injected" : "ScreenPointToRay");
-                }
-                if (mode_ == Mode::Mono && method) {
-                    Ray ray{};
-                    method->invoke<void>(this, position, eye, &ray);
-                    return ray;
-                }
-                if (method) {
-                    return method->invoke<Ray>(this, position, eye);
-                }
-                return {};
+            auto screen_point_to_ray(const Vector2& position, const Eye eye = Eye::Mono) -> Ray {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Camera")->get<Method>("ScreenPointToRay_Injected");
+                Ray ray{};
+                method->invoke<void>(this, position, eye, &ray);
+                return ray;
             }
         };
 
         struct Transform : Component {
-            auto GetPosition() -> Vector3 {
-                static Method* method;
-
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>("get_position_Injected");
-                }
-                constexpr Vector3 vec3{};
+            auto get_position() -> Vector3 {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>("get_position_Injected");
+                Vector3 vec3{};
                 method->invoke<void>(this, &vec3);
                 return vec3;
             }
 
-            auto SetPosition(const Vector3& position) -> void {
-                static Method* method;
-
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>("set_position_Injected");
-                }
+            auto set_position(const Vector3& position) -> void {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>("set_position_Injected");
                 return method->invoke<void>(this, &position);
             }
 
-            auto GetRight() -> Vector3 {
-                static Method* method;
-
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>("get_right");
-                }
-                if (method) {
-                    return method->invoke<Vector3>(this);
-                }
-                return {};
+            auto get_right() -> Vector3 {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>("get_right");
+                return method->invoke<Vector3>(this);
             }
 
-            auto SetRight(const Vector3& value) -> void {
-                static Method* method;
-
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>("set_right");
-                }
-                if (method) {
-                    return method->invoke<void>(this, value);
-                }
+            auto set_right(const Vector3& value) -> void {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>("set_right");
+                return method->invoke<void>(this, value);
             }
 
-            auto GetUp() -> Vector3 {
-                static Method* method;
-
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>("get_up");
-                }
-                if (method) {
-                    return method->invoke<Vector3>(this);
-                }
-                return {};
+            auto get_up() -> Vector3 {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>("get_up");
+                return method->invoke<Vector3>(this);
             }
 
-            auto SetUp(const Vector3& value) -> void {
-                static Method* method;
-
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>("set_up");
-                }
-                if (method) {
-                    return method->invoke<void>(this, value);
-                }
+            auto set_up(const Vector3& value) -> void {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>("set_up");
+                return method->invoke<void>(this, value);
             }
 
-            auto GetForward() -> Vector3 {
-                static Method* method;
-
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>("get_forward");
-                }
-                if (method) {
-                    return method->invoke<Vector3>(this);
-                }
-                return {};
+            auto get_forward() -> Vector3 {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>("get_forward");
+                return method->invoke<Vector3>(this);
             }
 
-            auto SetForward(const Vector3& value) -> void {
-                static Method* method;
-
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>("set_forward");
-                }
-                if (method) {
-                    return method->invoke<void>(this, value);
-                }
+            auto set_forward(const Vector3& value) -> void {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>("set_forward");
+                return method->invoke<void>(this, value);
             }
 
-            auto GetRotation() -> Quaternion {
-                static Method* method;
-
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>(mode_ == Mode::Mono ? "get_rotation_Injected" : "get_rotation");
-                }
-                if (mode_ == Mode::Mono && method) {
-                    constexpr Quaternion vec3{};
-                    method->invoke<void>(this, &vec3);
-                    return vec3;
-                }
-                if (method) {
-                    return method->invoke<Quaternion>(this);
-                }
-                return {};
+            auto get_rotation() -> Quaternion {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>("get_rotation_Injected");
+                Quaternion vec3{};
+                method->invoke<void>(this, &vec3);
+                return vec3;
             }
 
-            auto SetRotation(const Quaternion& position) -> void {
-                static Method* method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>(mode_ == Mode::Mono ? "set_rotation_Injected" : "set_rotation");
-                return mode_ == Mode::Mono ? method->invoke<void>(this, &position) : method->invoke<void>(this, position);
+            auto set_rotation(const Quaternion& position) -> void {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Transform")->get<Method>("set_rotation_Injected");
+                return method->invoke<void>(this, &position);
             }
 
             auto GetLocalPosition() -> Vector3 {
@@ -2115,228 +1966,123 @@ public:
 
         struct GameObject : UnityObject {
             static auto create(const std::string& _name) -> GameObject* {
-                auto klass = get("UnityEngine.CoreModule.dll")->get("GameObject");
+                static auto klass = get("UnityEngine.CoreModule.dll")->get("GameObject");
                 if (!klass) {
                     return nullptr;
                 }
+
                 auto obj = klass->create<GameObject>();
                 if (!obj) {
                     return nullptr;
                 }
-                static Method* method;
-                if (!method) {
-                    method = klass->get<Method>("Internal_CreateGameObject");
-                }
-                if (method) {
-                    method->invoke<void, GameObject*, String*>(obj, String::create(_name));
-                }
-                return obj ? obj : nullptr;
+
+                static Method* method = klass->get<Method>("Internal_CreateGameObject");
+                method->invoke<void, GameObject*, String*>(obj, String::create(_name));
+                return obj;
             }
 
             static auto find_game_objects_with_tag(const std::string& name) -> std::vector<GameObject*> {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("FindGameObjectsWithTag");
-                }
-                if (method) {
-                    const auto array = method->invoke<Array<GameObject*>*>(String::create(name));
-                    return array->to_vector();
-                }
-                return {};
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("FindGameObjectsWithTag");
+                return method->invoke<Array<GameObject*>*>(String::create(name))->to_vector();
             }
 
             static auto find(const std::string& _name) -> GameObject* {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("Find");
-                }
-                if (method) {
-                    return method->invoke<GameObject*>(String::create(_name));
-                }
-                return nullptr;
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("Find");
+                return method->invoke<GameObject*>(String::create(_name));
             }
 
             auto get_active() -> bool {
-                static Method* method;
-
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("get_active");
-                }
-                if (method) {
-                    return method->invoke<bool>(this);
-                }
-                return false;
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("get_active");
+                return method->invoke<bool>(this);
             }
 
             auto set_active(const bool value) -> void {
-                static Method* method;
-
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("set_active");
-                }
-                if (method) {
-                    return method->invoke<void>(this, value);
-                }
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("set_active");
+                return method->invoke<void>(this, value);
             }
 
-            auto GetActiveSelf() -> bool {
-                static Method* method;
-
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("get_activeSelf");
-                }
-                if (method) {
-                    return method->invoke<bool>(this);
-                }
-                return false;
+            auto get_active_self() -> bool {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("get_activeSelf");
+                return method->invoke<bool>(this);
             }
 
-            auto GetActiveInHierarchy() -> bool {
-                static Method* method;
-
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("get_activeInHierarchy");
-                }
-                if (method) {
-                    return method->invoke<bool>(this);
-                }
-                return false;
+            auto get_active_in_hierarchy() -> bool {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("get_activeInHierarchy");
+                return method->invoke<bool>(this);
             }
 
-            auto GetIsStatic() -> bool {
-                static Method* method;
-
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("get_isStatic");
-                }
-                if (method) {
-                    return method->invoke<bool>(this);
-                }
-                return false;
+            auto get_is_static() -> bool {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("get_isStatic");
+                return method->invoke<bool>(this);
             }
 
-            auto GetTransform() -> Transform* {
-                static Method* method;
-
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("get_transform");
-                }
-                if (method) {
-                    return method->invoke<Transform*>(this);
-                }
-                return nullptr;
+            auto get_transform() -> Transform* {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("get_transform");
+                return method->invoke<Transform*>(this);
             }
 
-            auto GetTag() -> String* {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("get_tag");
-                }
-                if (method) {
-                    return method->invoke<String*>(this);
-                }
-                return {};
+            auto get_tag() -> String* {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("get_tag");
+                return method->invoke<String*>(this);
             }
 
             template<typename T>
-            auto GetComponent() -> T {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("GetComponent");
-                }
-                if (method) {
-                    return method->invoke<T>(this);
-                }
-                return T();
+            auto get_component() -> T {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("GetComponent");
+                return method->invoke<T>(this);
             }
 
             template<typename T>
-            auto GetComponent(Class* type) -> T {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("GetComponent", {"System.Type"});
-                }
-                if (method) {
-                    return method->invoke<T>(this, type->get_type());
-                }
-                return T();
+            auto get_component(Class* type) -> T {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("GetComponent", {"System.Type"});
+                return method->invoke<T>(this, type->get_type());
             }
 
             template<typename T>
-            auto GetComponentInChildren(Class* type) -> T {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("GetComponentInChildren", {"System.Type"});
-                }
-                if (method) {
-                    return method->invoke<T>(this, type->get_type());
-                }
-                return T();
+            auto get_component_in_children(Class* type) -> T {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("GetComponentInChildren", {"System.Type"});
+                return method->invoke<T>(this, type->get_type());
             }
 
             template<typename T>
-            auto GetComponentInParent(Class* type) -> T {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("GetComponentInParent", {"System.Type"});
-                }
-                if (method) {
-                    return method->invoke<T>(this, type->get_type());
-                }
-                return T();
+            auto get_component_in_parent(Class* type) -> T {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("GetComponentInParent", {"System.Type"});
+                return method->invoke<T>(this, type->get_type());
             }
 
             template<typename T>
-            auto GetComponents(Class* type,
+            auto get_components(Class* type,
                                bool useSearchTypeAsArrayReturnType = false,
                                bool recursive = false,
                                bool includeInactive = true,
                                bool reverse = false,
                                List<T>* resultList = nullptr) -> std::vector<T> {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("GetComponentsInternal");
-                }
-                if (method) {
-                    return method->invoke<Array<T>*>(this, type->get_type(), useSearchTypeAsArrayReturnType, recursive, includeInactive, reverse, resultList)->to_vector();
-                }
-                return {};
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("GameObject")->get<Method>("GetComponentsInternal");
+                return method->invoke<Array<T>*>(this, type->get_type(), useSearchTypeAsArrayReturnType, recursive, includeInactive, reverse, resultList)->to_vector();
             }
 
             template<typename T>
-            auto GetComponentsInChildren(Class* type, const bool includeInactive = false) -> std::vector<T> {
-                return GetComponents<T>(type, false, true, includeInactive, false, nullptr);
+            auto get_components_in_children(Class* type, const bool includeInactive = false) -> std::vector<T> {
+                return get_components<T>(type, false, true, includeInactive, false, nullptr);
             }
 
             template<typename T>
-            auto GetComponentsInParent(Class* type, const bool includeInactive = false) -> std::vector<T> {
-                return GetComponents<T>(type, false, true, includeInactive, true, nullptr);
+            auto get_components_in_parent(Class* type, const bool includeInactive = false) -> std::vector<T> {
+                return get_components<T>(type, false, true, includeInactive, true, nullptr);
             }
         };
 
         struct LayerMask : Object {
             int m_Mask;
 
-            static auto NameToLayer(const std::string& layerName) -> int {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("LayerMask")->get<Method>("NameToLayer");
-                }
-                if (method) {
-                    return method->invoke<int>(String::create(layerName));
-                }
-                return 0;
+            static auto name_to_layer(const std::string& layerName) -> int {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("LayerMask")->get<Method>("NameToLayer");
+                return method->invoke<int>(String::create(layerName));
             }
 
-            static auto LayerToName(const int layer) -> String* {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("LayerMask")->get<Method>("LayerToName");
-                }
-                if (method) {
-                    return method->invoke<String*>(layer);
-                }
-                return {};
+            static auto layer_to_name(const int layer) -> String* {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("LayerMask")->get<Method>("LayerToName");
+                return method->invoke<String*>(layer);
             }
         };
 
@@ -2393,32 +2139,20 @@ public:
         };
 
         struct Collider : Component {
-            auto GetBounds() -> Bounds {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.PhysicsModule.dll")->get("Collider")->get<Method>("get_bounds_Injected");
-                }
-                if (method) {
-                    Bounds bounds;
-                    method->invoke<void>(this, &bounds);
-                    return bounds;
-                }
-                return {};
+            auto get_bounds() -> Bounds {
+                static Method* method = get("UnityEngine.PhysicsModule.dll")->get("Collider")->get<Method>("get_bounds_Injected");
+                Bounds bounds;
+                method->invoke<void>(this, &bounds);
+                return bounds;
             }
         };
 
         struct Mesh : UnityObject {
-            auto GetBounds() -> Bounds {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Mesh")->get<Method>("get_bounds_Injected");
-                }
-                if (method) {
-                    Bounds bounds;
-                    method->invoke<void>(this, &bounds);
-                    return bounds;
-                }
-                return {};
+            auto get_bounds() -> Bounds {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Mesh")->get<Method>("get_bounds_Injected");
+                Bounds bounds;
+                method->invoke<void>(this, &bounds);
+                return bounds;
             }
         };
 
@@ -2469,64 +2203,35 @@ public:
         };
 
         struct BoxCollider : Collider {
-            auto GetCenter() -> Vector3 {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.PhysicsModule.dll")->get("BoxCollider")->get<Method>("get_center");
-                }
-                if (method) {
-                    return method->invoke<Vector3>(this);
-                }
-                return {};
+            auto get_center() -> Vector3 {
+                static Method* method = get("UnityEngine.PhysicsModule.dll")->get("BoxCollider")->get<Method>("get_center");
+                return method->invoke<Vector3>(this);
             }
 
-            auto GetSize() -> Vector3 {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.PhysicsModule.dll")->get("BoxCollider")->get<Method>("get_size");
-                }
-                if (method) {
-                    return method->invoke<Vector3>(this);
-                }
-                return {};
+            auto get_size() -> Vector3 {
+                static Method* method = get("UnityEngine.PhysicsModule.dll")->get("BoxCollider")->get<Method>("get_size");
+                return method->invoke<Vector3>(this);
             }
         };
 
         struct Renderer : Component {
-            auto GetBounds() -> Bounds {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Renderer")->get<Method>("get_bounds_Injected");
-                }
-                if (method) {
-                    Bounds bounds;
-                    method->invoke<void>(this, &bounds);
-                    return bounds;
-                }
-                return {};
+            auto get_bounds() -> Bounds {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Renderer")->get<Method>("get_bounds_Injected");
+                Bounds bounds;
+                method->invoke<void>(this, &bounds);
+                return bounds;
             }
         };
 
         struct Behaviour : Component {
-            auto GetEnabled() -> bool {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Behaviour")->get<Method>("get_enabled");
-                }
-                if (method) {
-                    return method->invoke<bool>(this);
-                }
-                return false;
+            auto get_enabled() -> bool {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Behaviour")->get<Method>("get_enabled");
+                return method->invoke<bool>(this);
             }
 
-            auto SetEnabled(const bool value) -> void {
-                static Method* method;
-                if (!method) {
-                    method = get("UnityEngine.CoreModule.dll")->get("Behaviour")->get<Method>("set_enabled");
-                }
-                if (method) {
-                    return method->invoke<void>(this, value);
-                }
+            auto set_enabled(const bool value) -> void {
+                static Method* method = get("UnityEngine.CoreModule.dll")->get("Behaviour")->get<Method>("set_enabled");
+                return method->invoke<void>(this, value);
             }
         };
 
@@ -2637,16 +2342,9 @@ public:
                 LastBone = 55
             };
 
-            auto GetBoneTransform(const HumanBodyBones humanBoneId) -> Transform* {
-                static Method* method;
-
-                if (!method) {
-                    method = get("UnityEngine.AnimationModule.dll")->get("Animator")->get<Method>("GetBoneTransform");
-                }
-                if (method) {
-                    return method->invoke<Transform*>(this, humanBoneId);
-                }
-                return nullptr;
+            auto get_bone_transform(const HumanBodyBones humanBoneId) -> Transform* {
+                static Method* method = get("UnityEngine.AnimationModule.dll")->get("Animator")->get<Method>("GetBoneTransform");
+                return method->invoke<Transform*>(this, humanBoneId);
             }
         };
 

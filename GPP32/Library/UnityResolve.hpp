@@ -1,12 +1,4 @@
-// 临时修改版本﻿
-// 临时修改版本﻿
-// 临时修改版本﻿
-// 临时修改版本﻿
-// 临时修改版本﻿
-// 临时修改版本﻿
-// 临时修改版本﻿
-// 临时修改版本﻿
-#ifndef UNITYRESOLVE_HPP
+﻿#ifndef UNITYRESOLVE_HPP
 #define UNITYRESOLVE_HPP
 
 // ============================== 自动检测当前环境 ==============================
@@ -245,7 +237,7 @@ public:
 
             if (pMethod && obj_type) {
                 if (auto array = pMethod->Invoke<UnityType::Array<T>*>(obj_type)) {
-                    return array->ToVector();
+                    return array->to_vector();
                 }
             }
 
@@ -2086,7 +2078,7 @@ public:
             }
 
             auto operator[](const unsigned int m_uIndex) -> Type& {
-                return data->At(m_uIndex);
+                return data->at(m_uIndex);
             }
 
             auto Add(Type pDate) -> void {
@@ -2182,7 +2174,7 @@ public:
             void* pValues;
 
             auto GetEntry() -> Entry* {
-                return reinterpret_cast<Entry*>(pEntries->GetData());
+                return reinterpret_cast<Entry*>(pEntries->get_data());
             }
 
             auto GetKeyByIndex(const int iIndex) -> TKey& {
