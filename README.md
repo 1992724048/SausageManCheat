@@ -16,7 +16,7 @@
 > 因使用SYCL需要以下至少一种硬件的OpenCL特性支持
 >
 > - Intel
-> - [X] CPU (可能需带有dGPU/iGPU)
+> - [X] CPU (可能需带有iGPU)
 > - [X] iGPU (需要安装相关驱动)
 > - [X] dGPU (需要安装相关驱动)
 > - *intel 21年后处理器(11代开始)基本上都支持OpenCL (如赛扬N5095低压U支持OpenCL 1.2 版本)
